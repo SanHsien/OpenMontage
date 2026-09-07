@@ -8,6 +8,7 @@ by default.
 from __future__ import annotations
 
 import json
+import subprocess
 import time
 from pathlib import Path
 from typing import Any
@@ -179,17 +180,36 @@ class VideoTrimmer(BaseTool):
             artifacts=[str(output_path)],
         )
 
+    def _has_video_stream(self, path: Path) -> bool:
+        """True when the file carries at least one decodable video frame.
+
+        An empty video stream still reports codec_type=video, so count frames.
+        """
+        proc = subprocess.run(
+            ["ffprobe", "-v", "error", "-select_streams", "v:0", "-count_frames",
+             "-show_entries", "stream=nb_read_frames", "-of", "csv=p=0", str(path)],
+            capture_output=True, text=True,
+        )
+        if proc.returncode != 0:
+            return False
+        frames = proc.stdout.strip().split("\n")[0].strip()
+        return frames.isdigit() and int(frames) > 1
+
     def _concat(self, inputs: dict[str, Any]) -> ToolResult:
         segments = inputs.get("segments", [])
         if not segments:
             return ToolResult(success=False, error="No segments provided for concat")
 
         output_path = Path(inputs.get("output_path", "concat_output.mp4"))
+        codec = inputs.get("codec", "copy")
 
         # First, cut each segment to a temp file if start/end are specified
         temp_files: list[Path] = []
         temp_dir = output_path.parent / ".concat_tmp"
         temp_dir.mkdir(parents=True, exist_ok=True)
+        # Bound before the try: the finally unlinks it, and any early return
+        # inside the loop would otherwise raise NameError from the cleanup.
+        list_path = temp_dir / "concat_list.txt"
 
         try:
             for i, seg in enumerate(segments):
@@ -202,19 +222,37 @@ class VideoTrimmer(BaseTool):
 
                 if seg_start is not None or seg_end is not None:
                     temp_path = temp_dir / f"seg_{i:04d}{seg_input.suffix}"
-                    cmd = ["ffmpeg", "-y", "-i", str(seg_input)]
+                    # -ss/-to must precede -i. After -i they are output seeks,
+                    # which with -c copy keep only whole packets from the next
+                    # keyframe and reduced every segment here to ONE frame.
+                    cmd = ["ffmpeg", "-y"]
                     if seg_start is not None:
                         cmd.extend(["-ss", str(seg_start)])
                     if seg_end is not None:
                         cmd.extend(["-to", str(seg_end)])
-                    cmd.extend(["-c", "copy", str(temp_path)])
+                    cmd.extend(["-i", str(seg_input)])
+                    if codec == "copy":
+                        # Stream copy cannot split a GOP, so cuts snap outward to
+                        # keyframes. Pass an encoder (e.g. libx264) for frame-accurate
+                        # boundaries.
+                        cmd.extend(["-c", "copy"])
+                    else:
+                        cmd.extend(["-c:v", codec, "-c:a", "aac"])
+                    cmd.append(str(temp_path))
                     self.run_command(cmd)
+                    if not self._has_video_stream(temp_path):
+                        return ToolResult(
+                            success=False,
+                            error=(
+                                f"Segment {i} ({seg_input.name} "
+                                f"{seg_start}-{seg_end}s) produced no video stream."
+                            ),
+                        )
                     temp_files.append(temp_path)
                 else:
                     temp_files.append(seg_input)
 
             # Write concat file list
-            list_path = temp_dir / "concat_list.txt"
             with open(list_path, "w", encoding="utf-8") as f:
                 for tf in temp_files:
                     # FFmpeg concat demuxer needs forward slashes and escaped quotes
@@ -229,6 +267,15 @@ class VideoTrimmer(BaseTool):
                 str(output_path),
             ]
             self.run_command(cmd)
+
+            if not self._has_video_stream(output_path):
+                return ToolResult(
+                    success=False,
+                    error=(
+                        f"Concat produced no video stream at {output_path}. "
+                        "Segments are likely incompatible; try codec='libx264'."
+                    ),
+                )
 
             return ToolResult(
                 success=True,
