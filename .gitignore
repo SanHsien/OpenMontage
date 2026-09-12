@@ -104,3 +104,7 @@ venv/
 
 # Local Wan / diffusers GPU environment
 .venv-wan/
+
+# Maintenance reports
+upstream-review-report.md
+dependency-freshness-report.md

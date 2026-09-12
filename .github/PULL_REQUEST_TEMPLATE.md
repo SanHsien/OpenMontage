@@ -1,30 +1,21 @@
-<!--
-Thanks for contributing to OpenMontage! Please fill in the sections below.
-Keep PRs focused — one logical change per PR is easier to review and merge.
--->
+﻿## 變更
 
-## Summary
+簡述問題、修正與使用者可觀察到的結果。
 
-<!-- What does this PR do, and why? -->
+## 類型
 
-## Related issue
+- [ ] Bug 修復
+- [ ] 新功能
+- [ ] 文件／開發環境
+- [ ] 上游同步
+- [ ] 測試／CI
 
-<!-- Link the issue this closes, e.g. "Closes #123". Use "Refs #123" if it only relates. -->
-Closes #
+## 驗證
 
-## Changes
+- [ ] 新行為先有失敗測試
+- [ ] `pwsh -NoProfile -File tools\dev_check.ps1`
+- [ ] 沒有提交敏感文件、個人資料或憑證
 
-<!-- Bullet the notable changes. -->
--
+## 上游與相容性
 
-## Testing
-
-<!-- How did you verify this? Commands run, manual steps, platforms checked. -->
--
-
-## Checklist
-
-- [ ] The change is focused on a single logical concern.
-- [ ] I ran the relevant tests locally (`make test-contracts` / `make test`) where applicable.
-- [ ] I updated docs/README if behavior or usage changed.
-- [ ] No unrelated files (build artifacts, local config) are included in the diff.
+說明是否來自 upstream、是否改動核心模組或影音管線，以及需要保留的 fork 差異。
