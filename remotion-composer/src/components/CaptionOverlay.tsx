@@ -124,8 +124,17 @@ const PageRenderer: React.FC<{
                     ? `0 0 20px ${highlightColor}66, 0 2px 4px rgba(0,0,0,0.5)`
                     : "0 2px 4px rgba(0,0,0,0.5)",
                 }}
-              >
-                {w.word}{i < page.words.length - 1 ? wordSeparator : ""}
+                {w.word}
+                {/* A plain " " inside an inline-block gets trimmed away by the
+                    browser, which glues space-delimited words together
+                    ("Seupróximocliente"). A non-breaking space survives, so
+                    space-delimited languages keep their gaps while CJK
+                    (wordSeparator="") stays untouched. */}
+                {i < page.words.length - 1
+                  ? wordSeparator === " "
+                    ? "\u00A0"
+                    : wordSeparator
+                  : ""}
               </span>
             );
           })}

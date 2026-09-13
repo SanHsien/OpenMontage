@@ -36,6 +36,8 @@ export interface ThemeConfig {
   transitionDuration: number;
   captionHighlightColor: string;
   captionBackgroundColor: string;
+  /** Optional bundled local fonts (e.g. CJK/Devanagari) for non-Latin scripts. */
+  localFonts?: import("./lib/fonts").LocalFont[];
 }
 
 export const THEMES: Record<string, ThemeConfig> = {

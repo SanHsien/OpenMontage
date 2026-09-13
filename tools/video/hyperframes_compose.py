@@ -257,7 +257,12 @@ class HyperFramesCompose(BaseTool):
             return None
         try:
             out = subprocess.run(
-                [node, "--version"], capture_output=True, text=True, timeout=5
+                [node, "--version"],
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                timeout=5,
             )
             if out.returncode != 0:
                 return None
@@ -295,6 +300,8 @@ class HyperFramesCompose(BaseTool):
                 [npm, "view", cls._NPM_PACKAGE, "version"],
                 capture_output=True,
                 text=True,
+                encoding="utf-8",
+                errors="replace",
                 timeout=5,
             )
         except subprocess.TimeoutExpired:
@@ -308,24 +315,18 @@ class HyperFramesCompose(BaseTool):
             stderr = (proc.stderr or "").strip()
             # Most common failure is 404 (package unpublished or name wrong).
             if "404" in stderr or "E404" in stderr:
-                cls._npm_resolve_cache = {
-                    "error": f"npm package `{cls._NPM_PACKAGE}` not found (404)"
-                }
+                cls._npm_resolve_cache = {"error": f"npm package '{cls._NPM_PACKAGE}' not found (404)"}
             else:
-                tail = stderr.splitlines()[-1][:200] if stderr else f"exit {proc.returncode}"
-                cls._npm_resolve_cache = {"error": f"npm view failed: {tail}"}
+                cls._npm_resolve_cache = {"error": f"npm view exit {proc.returncode}: {stderr[:120]}"}
             return cls._npm_resolve_cache
 
-        version = (proc.stdout or "").strip()
-        if not version:
-            cls._npm_resolve_cache = {"error": "npm view returned empty version"}
-        else:
-            cls._npm_resolve_cache = {"version": version}
+        version = proc.stdout.strip()
+        cls._npm_resolve_cache = {"version": version}
         return cls._npm_resolve_cache
 
     @classmethod
     def _probe_cli(cls) -> dict[str, str]:
-        """Run the published CLI's doctor command once per process.
+        """Verify that the HyperFrames CLI can actually execute in this environment.
 
         Package resolution alone does not prove that the executable can start:
         an upstream packaging regression can publish successfully while every
@@ -345,6 +346,8 @@ class HyperFramesCompose(BaseTool):
                 [npx, "--yes", cls._NPM_PACKAGE, "doctor", "--json"],
                 capture_output=True,
                 text=True,
+                encoding="utf-8",
+                errors="replace",
                 timeout=20,
             )
         except subprocess.TimeoutExpired:

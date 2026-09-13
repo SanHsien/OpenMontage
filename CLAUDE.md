@@ -1,6 +1,6 @@
-﻿# CLAUDE.md
+# CLAUDE.md
 
-請先完整閱讀並遵守 [`AGENTS.md`](AGENTS.md)。本檔只補充 Claude Code 的最小入口：
+請先完整閱讀並遵守 [`AGENTS.md`](AGENTS.md) 與影視製作總指南 [`AGENT_GUIDE.md`](AGENT_GUIDE.md)。本檔只補充 Claude Code 的最小入口：
 
 - 這是保留上游歷史的 fork；不要移除 `upstream`、原作者或 GNU AGPLv3 授權標示。
 - 核心模組在 `tools/`、管線在 `pipeline_defs/`、Remotion 合成在 `remotion-composer/`，以上游為準。

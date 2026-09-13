@@ -1,4 +1,4 @@
-﻿# 上游維護
+# 上游維護
 
 ## Remote
 
@@ -62,5 +62,18 @@ Fork 自動複製了 27 個非 main 分支，已自 `origin` 全數清理刪除�
 
 2. **增量巡檢機制**：
    - 每次執行 `tools/check_upstream_updates.py` 或 GitHub Actions 每週排程時，檢查器會自動過濾 `number <= watermark` 的項目。
-   - 只有編號大於 **#649** 的新開 PR / Issue，或 `main` 上高於 `08e2151` 的新 Commit，才會出現在待審報告中。
-   - 當新項目被審查完畢並於 `docs/DECISIONS.md` 記錄結論後，再遞增更新 baseline 水位。
+    - 只有編號大於 **#649** 的新開 PR / Issue，或 `main` 上高於 `08e2151` 的新 Commit，才會出現在待審報告中。
+    - 當新項目被審查完畢並於 `docs/DECISIONS.md` 記錄結論後，再遞增更新 baseline 水位。
+
+### 三、首次上游未合併分支與待處理 PR 處理紀錄
+
+| 項目 | 類型 | 評估結論 | 處置方式 |
+|---|---|---|---|
+| `upstream/fix/backlot-ui-layout` | Branch | 經查其修訂（no-cache、9:16 portrait video 樣式、媒體欄排版）已在 `main` 完整落實 | 判定為過期陳舊分支，不需重複處理 |
+| `upstream/docs/readme-add-alexandria-remove-abyss` | Branch | 僅更新 Star 歷史圖表與徽章 | 略過，無功能性價值 |
+| PR `#640` | PR | 修復 `diagram_gen` Mermaid CLI 可用性假陽性 | **引進合併**至本 fork |
+| PR `#641` | PR | 修復 `source_media_review` 影片技術探針被音訊覆蓋與抽樣 key 錯誤 | **引進合併**至本 fork |
+| PR `#642` | PR | 修復 `video_trimmer` concat 輸入 seek、編碼器選擇與 videoless 檢驗 | **引進合併**至本 fork |
+| PR `#649` | PR | Remotion 支援 CJK / 繁體中文與非拉丁字型載入，修復模擬門禁 | **引進合併**至本 fork |
+| PR `#650` | PR | Remotion 字幕單字間距保持（non-breaking space）與深色主題卡片對比修復 | **引進合併**至本 fork |
+| Issue `#626` | Issue | 防範網路假冒二進位安裝檔（`OpenMontage-app`）木馬釣魚 | 寫入 `SECURITY.md` 警示宣告 |

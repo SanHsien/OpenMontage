@@ -1,4 +1,4 @@
-﻿# Repository review（Windows-only）
+# Repository review（Windows-only）
 
 - Review date: 2026-09-12
 - Review baseline: `08e2151fa02de28a5d6a312b3d575692bf147ad7`
@@ -44,6 +44,14 @@ gh repo set-default --view
 | R-07 | P2 | 建立純 Windows 原生 CI（`ci.yml`、`codeql.yml`、`upstream-check.yml`、`dependency-freshness.yml`） |
 | R-08 | P2 | 建立上游追蹤水位防重複巡檢機制，鎖定 PR `#649`、Issue `#649` |
 | R-09 | P2 | 清理 GitHub fork 遠端上 27 個非 main 分支，維持 `origin` 僅有單一維護主線 `main` |
+| R-10 | P1 | 修復 `tools/video/hunyuan_video.py` 遺漏 `from typing import Any`（Ruff F821 未定義變數例外） |
+| R-11 | P3 | 修正 `AGENTS.md`、`CLAUDE.md`、`GEMINI.md` 引用 `AGENT_GUIDE.md`，使 `test_platform_wrappers_reference_agent_guide` 100% 通過 |
+| R-12 | P2 | 引進上游 PR #640：`tools/graphics/diagram_gen.py` 精確回報 Mermaid CLI (`mmdc`) 可用性狀態，並在 Preflight 拋出明確警示 |
+| R-13 | P1 | 引進上游 PR #641：修復 `lib/source_media_review.py` 將影片資訊誤歸類為音訊探針、`frame_sampler` 遺漏 `strategy` 參數及回傳 frame key 錯誤，徹底解決影片抽樣與規格誤報問題 |
+| R-14 | P1 | 引進上游 PR #642：修復 `tools/video/video_trimmer.py` concat 模式因輸出 seek 導致輸出無畫面（僅剩 1 幀/純音訊）之嚴重大 bug，並修正 `codec` 被忽略、`list_path` 提前未綁定引發 `UnboundLocalError`，並加入輸出影片解碼幀驗證 |
+| R-15 | P2 | 引進上游 PR #649：為 Remotion 增加 CJK / 繁體中文與非拉丁字型動態注入支援（`lib/fonts.ts`、`Explainer.tsx`、`TextCard.tsx`），並補齊 `scripts/backlot_simulate_run.py` 所缺之 proposal 門禁前置條件 |
+| R-16 | P2 | 修復 Windows 11 環境下 `hyperframes_compose.py` 與 `video_trimmer.py` 呼叫 subprocess 時因預設 cp950 導致 `UnicodeDecodeError: 'cp950'` 之例外，全面強化 `encoding="utf-8", errors="replace"` |
+| R-17 | P2 | 引進上游 PR #650：修復 Remotion 字幕在 inline-block 中單字空白被瀏覽器修剪黏合之缺陷（改採 non-breaking space 保持間隔），並修復深色主題下 `KPIGrid` 與 `ComparisonCard` 顏色對比度不足／卡片文字白底白字之問題 |
 
 ## 接受、不改契約
 

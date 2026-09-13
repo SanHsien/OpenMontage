@@ -1,6 +1,6 @@
-﻿# AGENTS.md
+# AGENTS.md
 
-給 Codex、Claude Code、Cursor、Antigravity 與其他自動化代理在本專案工作時的指引。產品與使用方式先讀 [`README.md`](README.md)；開發與驗收細節見 [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md)。
+給 Codex、Claude Code、Cursor、Antigravity 與其他自動化代理在本專案工作時的指引。影視製作與 Agent 詳細手冊請見 [`AGENT_GUIDE.md`](AGENT_GUIDE.md)；產品與使用方式先讀 [`README.md`](README.md)；開發與驗收細節見 [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md)。
 
 ## 專案定位
 

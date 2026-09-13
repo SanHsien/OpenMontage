@@ -31,6 +31,7 @@ import { ScreenshotScene } from "./components/ScreenshotScene";
 import type { ScreenshotStep } from "./components/ScreenshotScene";
 import { ProviderChip } from "./components/ProviderChip";
 import { resolveAsset } from "./lib/resolveAsset";
+import { injectLocalFonts } from "./lib/fonts";
 import type { ParticleType } from "./components/ParticleOverlay";
 import { resolveTheme, type ThemeConfig, DEFAULT_THEME } from "./Root";
 
@@ -208,6 +209,8 @@ interface Cut {
   rightLabel?: string;
   leftValue?: string;
   rightValue?: string;
+  leftColor?: string;
+  rightColor?: string;
   // Chart props
   chartData?: any[];
   chartSeries?: any[];
@@ -615,6 +618,7 @@ const SceneRenderer: React.FC<{ cut: Cut; theme: ThemeConfig }> = ({ cut, theme 
       <ComparisonCard
         leftLabel={cut.leftLabel} rightLabel={cut.rightLabel}
         leftValue={cut.leftValue} rightValue={cut.rightValue}
+        leftColor={cut.leftColor} rightColor={cut.rightColor}
         title={cut.title} backgroundColor={bgColor} textColor={textColor}
         cardBackgroundColor={cut.cardBackgroundColor || theme.surfaceColor}
       />
@@ -694,6 +698,7 @@ const SceneRenderer: React.FC<{ cut: Cut; theme: ThemeConfig }> = ({ cut, theme 
         metrics={cut.chartData} title={cut.title} columns={cut.columns}
         colors={cut.chartColors || theme.chartColors} animationStyle={(cut.chartAnimation as any) || "count-up"}
         backgroundColor={bgColor}
+        cardBackgroundColor={cut.cardBackgroundColor || theme.surfaceColor}
         textColor={textColor}
       />
     );
@@ -841,6 +846,12 @@ export const Explainer: React.FC<ExplainerProps> = (props) => {
   // Resolve theme from props — playbook name, theme name, or custom themeConfig
   const theme = resolveTheme(props as Record<string, unknown>);
 
+  // Inject any bundled local fonts (non-Latin scripts like Devanagari/CJK
+  // render blank in headless Chromium without this).
+  if (theme.localFonts && theme.localFonts.length > 0) {
+    injectLocalFonts(theme.localFonts);
+  }
+
   return (
     <AbsoluteFill style={{ background: theme.backgroundColor, fontFamily: theme.headingFont || fontFamily }}>
       {/* Layer 0: Animated gradient background — driven by theme */}
@@ -881,6 +892,7 @@ export const Explainer: React.FC<ExplainerProps> = (props) => {
           color={theme.textColor}
           highlightColor={theme.captionHighlightColor}
           backgroundColor={theme.captionBackgroundColor}
+          fontFamily={theme.bodyFont || theme.headingFont || "Space Grotesk, Inter, system-ui, sans-serif"}
         />
       )}
 

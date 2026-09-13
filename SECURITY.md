@@ -1,4 +1,4 @@
-﻿# 安全政策
+# 安全政策
 
 ## 支援範圍
 
@@ -16,6 +16,7 @@
 
 ## 特別注意
 
+- **防範假冒二進位安裝檔（Issue #626 安全警示）**：OpenMontage 專案目前**僅以 Python 及 Node.js 原生原始碼**形式發布，**官方從未發布任何已編譯的二進位安裝檔（如 `.exe`、`.msi`、`.pkg`、`.dmg`）**。網路上流傳之「OpenMontage Desktop」或「OpenMontage-app」執行檔均為第三方假冒並夾帶惡意後門木馬的釣魚軟體。請務必直接自 GitHub 官方或本 fork 原始碼環境克隆並使用 `python` / `npx` 啟動，切勿下載執行來路不明的二進位檔案。
 - **API 金鑰安全**：OpenMontage 支援接入 OpenAI、Google、ElevenLabs、Kling 等雲端服務，所有憑證皆透過 `.env` 管理，絕對不可提交至版本控制。
 - **本機執行隔離**：使用 ComfyUI、Ollama 或本機顯卡執行時，注意本機服務埠存取控制，避免未授權網路請求。
 - **檔案處理防護**：影片合成與暫存涉及多種多媒體格式處理（MP4, WAV, JSON, Remotion bundles），注意防範路徑遍歷與非預期覆寫。

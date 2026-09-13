@@ -29,7 +29,10 @@ def _frame_count(path: Path) -> int:
     proc = subprocess.run(
         ["ffprobe", "-v", "error", "-select_streams", "v:0", "-count_frames",
          "-show_entries", "stream=nb_read_frames", "-of", "csv=p=0", str(path)],
-        capture_output=True, text=True,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
     )
     out = proc.stdout.strip().split("\n")[0].strip()
     return int(out) if out.isdigit() else 0

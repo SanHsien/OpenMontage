@@ -94,6 +94,86 @@ def main() -> int:
     brief["topic"] = "The Last Lighthouse"
     cp("research", "completed", {"research_brief": brief})
 
+    # proposal (required by the gate contract before script)
+    cp("proposal", "in_progress", {})
+    proposal = {
+        "version": "1.0",
+        "concept_options": [
+            {
+                "id": "c1", "title": "The Lighthouse That Refused To Go Dark",
+                "hook": "One keeper, one storm, one light that chose to stay lit.",
+                "narrative_structure": "story",
+                "visual_approach": "Restrained cinematic single-location, cold palette, optical flare only on the beam.",
+                "target_duration_seconds": 21,
+                "key_points": ["The light is a promise", "Someone still climbs"],
+                "core_message": "Steadiness is the rarest craft.",
+                "cta": "Watch the full piece on HeadOn Impact.",
+                "tone": "cinematic",
+                "why_this_works": "Single-location restraint reads as premium; zero generic AI gloss.",
+            },
+            {
+                "id": "c2", "title": "The Night The Light Went Out",
+                "hook": "Every lighthouse fails. The question is who climbs.",
+                "narrative_structure": "problem_solution",
+                "visual_approach": "Documentary montage of storm footage cut against quiet interior.",
+                "target_duration_seconds": 21,
+                "key_points": ["Failure is inevitable", "Response is the craft"],
+                "core_message": "Resilience is a discipline, not luck.",
+                "cta": "Follow for more.",
+                "tone": "documentary",
+                "why_this_works": "Tension-first open earns the save.",
+            },
+            {
+                "id": "c3", "title": "The Keeper's Climb",
+                "hook": "Four flights of stairs between you and the dark.",
+                "narrative_structure": "journey",
+                "visual_approach": "Vertical motion typography climbing with the keeper.",
+                "target_duration_seconds": 21,
+                "key_points": ["The climb is the work", "No shortcuts up"],
+                "core_message": "Effort is the only honest signal.",
+                "cta": "Read the manifesto.",
+                "tone": "epic",
+                "why_this_works": "Kinetic type on black matches the Swiss editorial brand.",
+            },
+        ],
+        "selected_concept": {
+            "concept_id": "c1",
+            "rationale": "Agent recommendation: c1 best fits the clean-professional playbook and brand restraint.",
+        },
+        "production_plan": {
+            "pipeline": "cinematic-trailer",
+            "playbook": "clean-professional",
+            "stages": [
+                {"stage": "research", "tools": [{"tool_name": "web_search", "role": "gather reference", "available": True}], "approach": "Live reference pull."},
+                {"stage": "script", "tools": [{"tool_name": "llm", "role": "narration", "available": True}], "approach": "Tight 21s narration."},
+                {"stage": "assets", "tools": [{"tool_name": "flux_image", "role": "scene stills", "available": True, "estimated_cost_usd": 0.20}], "approach": "4 generated stills."},
+                {"stage": "compose", "tools": [{"tool_name": "remotion", "role": "assemble", "available": True}], "approach": "Remotion timeline."},
+            ],
+            "renderer_family": "cinematic-trailer",
+            "render_runtime": "remotion",
+            "composition_mode": "templated",
+            "delivery_promise": {
+                "promise_type": "motion_led", "motion_required": True,
+                "tone_mode": "cinematic", "quality_floor": "presentable",
+                "approved_fallback": "still_led",
+            },
+        },
+        "cost_estimate": {
+            "total_estimated_usd": 0.20,
+            "line_items": [{"tool": "flux_image", "operation": "4 scene stills", "estimated_usd": 0.20}],
+            "budget_verdict": "no_budget_set",
+        },
+        "approval": {"status": "pending"},
+        "metadata": {"simulated": True},
+    }
+    save_artifact("proposal_packet", proposal)
+    cp("proposal", "awaiting_human", {"proposal_packet": proposal},
+       review={"round": 1, "decision": "pass", "critical": 0,
+               "suggestions": 0, "nitpicks": 0,
+               "summary": "Logline holds; direction approved."})
+    time.sleep(wait)
+    cp("proposal", "completed", {"proposal_packet": proposal}, human_approved=True)
+
     # script gates: awaiting_human -> approved
     cp("script", "in_progress", {})
     save_artifact("script", art["script"])
