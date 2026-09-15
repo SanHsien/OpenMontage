@@ -93,3 +93,28 @@
    - 修復方案：更新 `remotion-composer/src/components/charts/BarChart.tsx` 與 `LineChart.tsx` 中的 `formatNumber`，保留最多兩位有效小數並去除尾隨零（如 `0.15`、`0.69`、`1.33` 均精確顯示），同時為 `BarChartProps` 與 `LineChartProps` 擴充可選 `decimals` 屬性。
 5. **基準線水位推進**：
    - `tools/upstream_baseline.json` 水位推進至 PR 655、Issue 654、日期 2026-09-13。
+
+## 2026-09-15：分支清理（僅留 main）、Dependabot 依賴合併、PR #656–#660 審查與 main 分支保護
+
+**決策**：
+1. **單一 main 分支治理與本機／遠端分支清理**：
+   - 遠端分支清理：Dependabot 自動開啟之 3 個 PR 經評估：
+     - PR #1 (`fast-uri` 3.1.5 -> 3.1.7 高風險安全性修正 GHSA-qw65-cvwx-89v3)：引進並 squash-merge，刪除遠端分支。
+     - PR #3 (`browserslist` 4.28.4 -> 4.28.9 與 `baseline-browser-mapping` 2.11.23)：引進並 squash-merge，刪除遠端分支。
+     - PR #2 (`baseline-browser-mapping` 2.10.40 -> 2.11.23)：已完全被 PR #3 包含，自動關閉並刪除遠端分支。
+   - 本機分支清理：刪除所有歷史暫存 `pr-*` 分支（pr-640 至 pr-655）。
+   - 結果：本機與遠端 `origin` 均僅保留唯一的 `main` 分支。
+2. **main 分支保護設定（比照其他維護 repo）**：
+   - 透過 GitHub API 對 `SanHsien/OpenMontage` 的 `main` 分支設定分支保護規則：
+     - `required_status_checks`：設定 Windows CI 矩陣（Python 3.10–3.14）、CodeQL 安全掃描（Python security scan）與 Upstream check 為必要檢查項（strict: false）。
+     - `allow_force_pushes`：false（禁止強制推送）。
+     - `allow_deletions`：false（禁止刪除 main 分支）。
+     - `enforce_admins`：false（允許管理員維護推送，符合「push 到 main 是我一直說的原則」）。
+3. **上游 PR #656–#660 評估與引進**：
+   - **PR #656**：`Fix BarChart value label precision`。上游針對 Issue #654 的修復，本 fork 先前已完成修復並同時支援小數控制，故標記已對齊。
+   - **PR #657**：`Feature/gpt gateway`。空白 PR 說明、未經測試的草稿，予以拒絕。
+   - **PR #658**：`TalkingHead: image overlay`。上游已關閉，略過。
+   - **PR #659（引進並合併）**：`fix: read ComfyUI workflow files as UTF-8`。修復 Windows 環境下載入 ComfyUI 工作流 JSON 時因未指定 UTF-8 導致 cp950 解碼崩潰之重要跨平台 bug，並引入非 ASCII 測試。
+   - **PR #660**：`feat(captions): shared phrase captions for subtitles.style "karaoke"`。卡拉 OK 歌詞渲染器功能擴充，先予暫緩（Defer）。
+4. **基準線更新**：
+   - `tools/upstream_baseline.json` 水位推進至 PR 660、Issue 654、日期 2026-09-15。

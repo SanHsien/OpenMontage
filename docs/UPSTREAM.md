@@ -104,3 +104,19 @@ Fork 自動複製了 27 個非 main 分支，已自 `origin` 全數清理刪除�
 - PR 水位：`655`
 - Issue 水位：`654`
 - 追蹤檔：[`tools/upstream_baseline.json`](../tools/upstream_baseline.json)
+
+## 2026-09-15：上游 PR #656–#660 審查與分支水位推進
+
+2026-09-15 針對上游最新 PR 進行盤點：
+
+| 項目 | 類型 | 評估結論 | 處置方式 |
+|---|---|---|---|
+| PR `#656` | PR | 修復 BarChart 數值標籤精度 | 本 fork 已先於 Issue #654 完成修復，維持現況 |
+| PR `#657` | PR | gpt gateway 草稿（空白說明） | 評估拒絕（無效變更） |
+| PR `#658` | PR | TalkingHead 圖片畫中畫疊加層 | 上游已關閉，略過 |
+| PR `#659` | PR | ComfyUI 工作流 JSON 強制以 UTF-8 讀取 | **引進合併**至本 fork（修復 Windows cp950 崩潰） |
+| PR `#660` | PR | 卡拉 OK 樣式片語字幕渲染器擴充 | 暫緩引進（Defer） |
+
+- PR 水位推進至 `660`
+- 分支狀態：本機與 `origin` 遠端均清理完成，僅保留唯一 `main` 分支
+- 分支保護：`main` 分支已建立 GitHub Branch Protection，綁定完整 Windows CI、CodeQL 與 Upstream check 門禁

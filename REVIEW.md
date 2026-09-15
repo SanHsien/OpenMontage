@@ -59,6 +59,8 @@ gh repo set-default --view
 | R-22 | P2 | 引進 PR #653：修復 Pond5 契約，強制金鑰與 Bearer 驗證，清空全部 known transport swallowers |
 | R-23 | P2 | 修復 Issue #654：修復 BarChart.tsx 與 LineChart.tsx 數值標籤浮點數精度截斷問題 |
 | R-24 | P3 | 評估 PR #655：安全白名單門控（密集迭代中），維持 Defer 暫緩引進決策 |
+| R-25 | P2 | 引進 PR #659：tools/_comfyui/client.py 明確以 UTF-8 載入工作流，防止 Windows cp950 解碼非 ASCII 崩潰 |
+| R-26 | P2 | 建立 main 分支保護規則：綁定 Windows CI 矩陣、CodeQL、Upstream check，禁止 force-push 與 deletion |
 
 ## 接受、不改契約
 
