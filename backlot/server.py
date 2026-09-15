@@ -245,13 +245,13 @@ def create_app() -> FastAPI:
     @app.get("/thumb/{project_id}/{file_path:path}")
     async def thumb(project_id: str, file_path: str, w: int = 640) -> FileResponse:
         project_dir = _safe_project_dir(project_id)
-        base_dir = os.path.abspath(str(project_dir))
-        safe_path = os.path.abspath(os.path.join(base_dir, file_path))
-        if not safe_path.startswith(base_dir + os.sep) and safe_path != base_dir:
+        base_path = os.path.normpath(str(project_dir))
+        fullpath = os.path.normpath(os.path.join(base_path, file_path))
+        if not fullpath.startswith(base_path):
             raise HTTPException(status_code=403, detail="path escapes project")
-        target = Path(safe_path)
-        if not target.is_file():
+        if not os.path.isfile(fullpath):
             raise HTTPException(status_code=404, detail="media not found")
+        target = Path(fullpath)
         width = min(THUMB_WIDTHS, key=lambda x: abs(x - w))
         cached = await asyncio.to_thread(_thumbnail_for, target, width)
         if cached is None:
@@ -259,7 +259,7 @@ def create_app() -> FastAPI:
             # non-thumbable images are safe to serve as-is.
             if target.suffix.lower() in {".mp4", ".webm", ".mov"}:
                 raise HTTPException(status_code=404, detail="no poster frame available")
-            return FileResponse(target)
+            return FileResponse(fullpath)
         return FileResponse(cached, media_type="image/jpeg")
 
     # ---- Media (range requests handled by FileResponse) ---------------
@@ -267,14 +267,14 @@ def create_app() -> FastAPI:
     @app.get("/media/{project_id}/{file_path:path}")
     async def media(project_id: str, file_path: str) -> FileResponse:
         project_dir = _safe_project_dir(project_id)
-        base_dir = os.path.abspath(str(project_dir))
-        safe_path = os.path.abspath(os.path.join(base_dir, file_path))
-        if not safe_path.startswith(base_dir + os.sep) and safe_path != base_dir:
+        base_path = os.path.normpath(str(project_dir))
+        fullpath = os.path.normpath(os.path.join(base_path, file_path))
+        if not fullpath.startswith(base_path):
             raise HTTPException(status_code=403, detail="path escapes project")
-        target = Path(safe_path)
-        if not target.is_file():
+        if not os.path.isfile(fullpath):
             raise HTTPException(status_code=404, detail="media not found")
-        return FileResponse(target)
+        target = Path(fullpath)
+        return FileResponse(fullpath)
 
     # ---- UI ------------------------------------------------------------
 
@@ -313,14 +313,13 @@ def _safe_project_dir(project_id: str) -> Path:
     # collapses back to PROJECTS_DIR itself).
     if any(c in project_id for c in "/\\:") or project_id in (".", ".."):
         raise HTTPException(status_code=400, detail="invalid project id")
-    base_dir = os.path.abspath(str(PROJECTS_DIR))
-    safe_path = os.path.abspath(os.path.join(base_dir, project_id))
-    if not safe_path.startswith(base_dir + os.sep) and safe_path != base_dir:
+    base_path = os.path.normpath(str(PROJECTS_DIR))
+    fullpath = os.path.normpath(os.path.join(base_path, project_id))
+    if not fullpath.startswith(base_path):
         raise HTTPException(status_code=400, detail="invalid project id")
-    project_dir = Path(safe_path)
-    if not project_dir.is_dir():
+    if not os.path.isdir(fullpath):
         raise HTTPException(status_code=404, detail=f"unknown project: {project_id}")
-    return project_dir
+    return Path(fullpath)
 
 
 def _sse(payload: dict) -> str:
