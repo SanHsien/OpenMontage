@@ -8,6 +8,7 @@ refetch state. The server never writes to project directories.
 from __future__ import annotations
 
 import asyncio
+import os
 import json
 import time
 from contextlib import asynccontextmanager, suppress
@@ -244,11 +245,11 @@ def create_app() -> FastAPI:
     @app.get("/thumb/{project_id}/{file_path:path}")
     async def thumb(project_id: str, file_path: str, w: int = 640) -> FileResponse:
         project_dir = _safe_project_dir(project_id)
-        target = (project_dir / file_path).resolve()
-        try:
-            target.relative_to(project_dir.resolve())
-        except ValueError:
+        base_dir = os.path.abspath(str(project_dir))
+        safe_path = os.path.abspath(os.path.join(base_dir, file_path))
+        if not safe_path.startswith(base_dir + os.sep) and safe_path != base_dir:
             raise HTTPException(status_code=403, detail="path escapes project")
+        target = Path(safe_path)
         if not target.is_file():
             raise HTTPException(status_code=404, detail="media not found")
         width = min(THUMB_WIDTHS, key=lambda x: abs(x - w))
@@ -266,11 +267,11 @@ def create_app() -> FastAPI:
     @app.get("/media/{project_id}/{file_path:path}")
     async def media(project_id: str, file_path: str) -> FileResponse:
         project_dir = _safe_project_dir(project_id)
-        target = (project_dir / file_path).resolve()
-        try:
-            target.relative_to(project_dir.resolve())
-        except ValueError:
+        base_dir = os.path.abspath(str(project_dir))
+        safe_path = os.path.abspath(os.path.join(base_dir, file_path))
+        if not safe_path.startswith(base_dir + os.sep) and safe_path != base_dir:
             raise HTTPException(status_code=403, detail="path escapes project")
+        target = Path(safe_path)
         if not target.is_file():
             raise HTTPException(status_code=404, detail="media not found")
         return FileResponse(target)
@@ -312,7 +313,11 @@ def _safe_project_dir(project_id: str) -> Path:
     # collapses back to PROJECTS_DIR itself).
     if any(c in project_id for c in "/\\:") or project_id in (".", ".."):
         raise HTTPException(status_code=400, detail="invalid project id")
-    project_dir = PROJECTS_DIR / project_id
+    base_dir = os.path.abspath(str(PROJECTS_DIR))
+    safe_path = os.path.abspath(os.path.join(base_dir, project_id))
+    if not safe_path.startswith(base_dir + os.sep) and safe_path != base_dir:
+        raise HTTPException(status_code=400, detail="invalid project id")
+    project_dir = Path(safe_path)
     if not project_dir.is_dir():
         raise HTTPException(status_code=404, detail=f"unknown project: {project_id}")
     return project_dir

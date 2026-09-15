@@ -61,6 +61,7 @@ gh repo set-default --view
 | R-24 | P3 | 評估 PR #655：安全白名單門控（密集迭代中），維持 Defer 暫緩引進決策 |
 | R-25 | P2 | 引進 PR #659：tools/_comfyui/client.py 明確以 UTF-8 載入工作流，防止 Windows cp950 解碼非 ASCII 崩潰 |
 | R-26 | P2 | 建立 main 分支保護規則：綁定 Windows CI 矩陣、CodeQL、Upstream check，禁止 force-push 與 deletion |
+| R-27 | P1 | 全面修復 GitHub Code Scanning 全部 17 個警示：包含 Kling 金鑰 PBKDF2 安全雜湊（CWE-327）、Backlot 伺服器路徑注入防護（CWE-22）與各模組 URL 網域名稱精準解析校驗（CWE-20） |
 
 ## 接受、不改契約
 

@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import json
 import time
+from urllib.parse import urlparse
 from pathlib import Path
 from typing import Any
 
@@ -132,14 +133,17 @@ class VideoAnalyzer(BaseTool):
         """Detect platform from URL."""
         if not self._is_url(source):
             return "local_file"
-        s = source.lower()
-        if "youtube.com/shorts" in s:
+        raw = source if "://" in source else f"https://{source}"
+        parsed = urlparse(raw)
+        host = (parsed.hostname or "").lower()
+        path = parsed.path.lower()
+        if (host in ("youtube.com", "www.youtube.com", "m.youtube.com") or host.endswith(".youtube.com")) and path.startswith("/shorts"):
             return "shorts"
-        if "youtube.com" in s or "youtu.be" in s:
+        if host in ("youtube.com", "www.youtube.com", "m.youtube.com", "youtu.be") or host.endswith(".youtube.com"):
             return "youtube"
-        if "instagram.com" in s:
+        if host == "instagram.com" or host.endswith(".instagram.com"):
             return "instagram"
-        if "tiktok.com" in s:
+        if host == "tiktok.com" or host.endswith(".tiktok.com"):
             return "tiktok"
         return "other_url"
 

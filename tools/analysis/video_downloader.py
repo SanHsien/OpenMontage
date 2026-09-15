@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 import re
 import time
+from urllib.parse import urlparse
 from pathlib import Path
 from typing import Any
 
@@ -135,18 +136,21 @@ class VideoDownloader(BaseTool):
 
     def _detect_platform(self, url: str) -> str:
         """Detect platform from URL."""
-        url_lower = url.lower()
-        if "youtube.com/shorts" in url_lower or "youtu.be" in url_lower and "/shorts" in url_lower:
+        raw = url if "://" in url else f"https://{url}"
+        parsed = urlparse(raw)
+        host = (parsed.hostname or "").lower()
+        path = parsed.path.lower()
+        if (host in ("youtube.com", "www.youtube.com", "m.youtube.com", "youtu.be") or host.endswith(".youtube.com")) and path.startswith("/shorts"):
             return "shorts"
-        if "youtube.com" in url_lower or "youtu.be" in url_lower:
+        if host in ("youtube.com", "www.youtube.com", "m.youtube.com", "youtu.be") or host.endswith(".youtube.com"):
             return "youtube"
-        if "instagram.com" in url_lower:
+        if host == "instagram.com" or host.endswith(".instagram.com"):
             return "instagram"
-        if "tiktok.com" in url_lower:
+        if host == "tiktok.com" or host.endswith(".tiktok.com"):
             return "tiktok"
-        if "vimeo.com" in url_lower:
+        if host == "vimeo.com" or host.endswith(".vimeo.com"):
             return "vimeo"
-        if "twitter.com" in url_lower or "x.com" in url_lower:
+        if host in ("twitter.com", "x.com") or host.endswith(".twitter.com") or host.endswith(".x.com"):
             return "twitter"
         return "other_url"
 

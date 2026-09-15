@@ -6,7 +6,7 @@ This module is a low-frequency helper, not an OpenMontage registry tool.
 from __future__ import annotations
 
 import time
-from hashlib import sha256
+import hashlib
 from typing import Any
 
 from .client import KlingClient
@@ -94,7 +94,7 @@ def _cache_key(client: Any, params: dict[str, Any]) -> tuple[tuple[str, str], ..
     """Scope Account Usage cache by request params and account endpoint identity."""
 
     api_key = getattr(client, "api_key", None) or ""
-    api_key_hash = sha256(str(api_key).encode("utf-8")).hexdigest() if api_key else ""
+    api_key_hash = (hashlib.pbkdf2_hmac("sha256", str(api_key).encode("utf-8"), b"kling_account_cache_salt", 100_000).hex() if api_key else "")
     scope = {
         "base_url": getattr(client, "base_url", ""),
         "api_key_sha256": api_key_hash,

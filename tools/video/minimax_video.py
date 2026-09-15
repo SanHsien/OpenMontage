@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import os
 import time
+from urllib.parse import urlparse
 from pathlib import Path
 from typing import Any
 
@@ -261,7 +262,8 @@ class MiniMaxVideo(BaseTool):
         return REGION_BASE_URLS.get(region, REGION_BASE_URLS[DEFAULT_REGION])
 
     def _uses_cn_api(self, base_url: str) -> bool:
-        return self._region() == "cn" or "api.minimaxi.com" in base_url
+        host = (urlparse(base_url).hostname or "").lower()
+        return self._region() == "cn" or host == "api.minimaxi.com" or host.endswith(".minimaxi.com")
 
     def get_status(self) -> ToolStatus:
         if self._get_api_key():
