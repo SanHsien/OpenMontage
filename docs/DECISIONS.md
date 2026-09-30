@@ -118,3 +118,26 @@
    - **PR #660**：`feat(captions): shared phrase captions for subtitles.style "karaoke"`。卡拉 OK 歌詞渲染器功能擴充，先予暫緩（Defer）。
 4. **基準線更新**：
    - `tools/upstream_baseline.json` 水位推進至 PR 660、Issue 654、日期 2026-09-15。
+
+## 2026-09-30：上游 PR #661–#687、Issue #664 審查（無新 commit）
+
+**決策**：上游 main 無新 commit（水位維持 `08e2151`）。19 筆 PR、1 筆 issue 已逐筆分流；未合併的開放 PR 一律暫緩，待上游合併後經 commit 軸抵達再評估（同 PR #655/#660 前例）。
+
+| 項目 | 結論 | 理由 |
+| --- | --- | --- |
+| #661 #662 #663 | 暫緩 | 開放中，Remotion 元件 props/字型變更（+28～260 行），尚未合併；合併後與本 fork remotion-composer 比對 |
+| #669 | 暫緩 | 開放中，playbook 契約測試與新 playbook |
+| #672 | 暫緩 | 開放中，1 檔 8 行 runtime-selection 修正，尚未合併 |
+| #673 | 不適用 | 新增 `/reel` 指令，上游工作流導向 |
+| #679 | 暫緩（adoption pending） | 開放中，`final_review` 黑畫面檢查修正（+48/-3），明確 bug 但未合併且未於本機驗證 |
+| #680 | 暫緩（adoption pending） | 開放中，piper_tts 在 venv 內尋找 binary（+39/-2），合併後採用 |
+| #681 #682 | 暫緩 | 開放中，RTL 文字與字幕空白修正，尚未合併 |
+| #683 #684 #687 | 暫緩 | 開放中，新 provider / 發佈器（+606～1272 行），不屬修正 |
+| #685 | 暫緩 | 已關閉未合併的 hyperframes 鍵讀取修正（+105/-16），觸發條件：本 fork 使用 hyperframes playbook schema 時回看 |
+| #666 | 不適用 | 已關閉；雲端設定下載 Piper 模型，本 fork 為純 Windows 維護線 |
+| #667 | 不適用 | 開放中，POD 產品廣告 pipeline（+17.6k 行），非修正 |
+| #674 #677 | 不適用 | 已關閉；巨量 vendor 更新（>700 檔） |
+| #678 | 不適用 | 已關閉；素材/藝術檔（77 檔） |
+| Issue #664 | 不適用 | 功能請求（新增 Magnific provider），非缺陷 |
+
+**基準線**：`tools/upstream_baseline.json` 推進至 PR 687、Issue 664、日期 2026-09-30。Baseline 代表已審查，未代表已合併。
