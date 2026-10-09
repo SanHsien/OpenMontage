@@ -3,78 +3,116 @@
   "deferrals": {
     "pytest": {
       "deferredLatest": "9.1.1",
+      "reviewed": "2026-10-09",
+      "revisit": "2026-11-09",
       "reason": "maintainer test suite baseline; keeps minimum compatibility floor across python 3.10-3.14"
     },
     "pytest-asyncio": {
       "deferredLatest": "1.4.0",
+      "reviewed": "2026-10-09",
+      "revisit": "2026-11-09",
       "reason": "maintainer test suite baseline; keeps minimum compatibility floor across python 3.10-3.14"
     },
     "httpx": {
       "deferredLatest": "0.28.1",
+      "reviewed": "2026-10-09",
+      "revisit": "2026-11-09",
       "reason": "maintainer test suite baseline; keeps minimum compatibility floor"
     },
     "ruff": {
       "deferredLatest": "0.16.10",
+      "reviewed": "2026-10-09",
+      "revisit": "2026-11-09",
       "reason": "maintainer linter baseline; bump tested separately from product changes"
     },
     "pydantic": {
       "deferredLatest": "2.14.0",
+      "reviewed": "2026-10-09",
+      "revisit": "2026-11-09",
       "reason": "upstream runtime compatibility floor; tracking calesthio/OpenMontage baseline"
     },
     "jsonschema": {
       "deferredLatest": "4.26.0",
+      "reviewed": "2026-10-09",
+      "revisit": "2026-11-09",
       "reason": "upstream runtime compatibility floor; tracking calesthio/OpenMontage baseline"
     },
     "python-dotenv": {
       "deferredLatest": "1.2.4",
+      "reviewed": "2026-10-09",
+      "revisit": "2026-11-09",
       "reason": "upstream runtime compatibility floor; tracking calesthio/OpenMontage baseline"
     },
     "Pillow": {
       "deferredLatest": "12.3.0",
+      "reviewed": "2026-10-09",
+      "revisit": "2026-11-09",
       "reason": "upstream runtime compatibility floor; tracking calesthio/OpenMontage baseline"
     },
     "numpy": {
       "deferredLatest": "2.5.3",
+      "reviewed": "2026-10-09",
+      "revisit": "2026-11-09",
       "reason": "upstream runtime compatibility floor; tracking calesthio/OpenMontage baseline"
     },
     "requests": {
       "deferredLatest": "2.34.2",
+      "reviewed": "2026-10-09",
+      "revisit": "2026-11-09",
       "reason": "upstream runtime compatibility floor; tracking calesthio/OpenMontage baseline"
     },
     "google-auth": {
       "deferredLatest": "2.61.0",
+      "reviewed": "2026-10-09",
+      "revisit": "2026-11-09",
       "reason": "upstream runtime compatibility floor; tracking calesthio/OpenMontage baseline"
     },
     "google-genai": {
       "deferredLatest": "2.29.0",
+      "reviewed": "2026-10-09",
+      "revisit": "2026-11-09",
       "reason": "upstream runtime compatibility floor; tracking calesthio/OpenMontage baseline"
     },
     "openai": {
       "deferredLatest": "3.26.1",
+      "reviewed": "2026-10-09",
+      "revisit": "2026-11-09",
       "reason": "upstream runtime compatibility floor; tracking calesthio/OpenMontage baseline"
     },
     "fastapi": {
       "deferredLatest": "0.143.0",
+      "reviewed": "2026-10-09",
+      "revisit": "2026-11-09",
       "reason": "upstream runtime compatibility floor; tracking calesthio/OpenMontage baseline"
     },
     "uvicorn": {
       "deferredLatest": "0.54.0",
+      "reviewed": "2026-10-09",
+      "revisit": "2026-11-09",
       "reason": "upstream runtime compatibility floor; tracking calesthio/OpenMontage baseline"
     },
     "watchfiles": {
       "deferredLatest": "1.3.0",
+      "reviewed": "2026-10-09",
+      "revisit": "2026-11-09",
       "reason": "upstream runtime compatibility floor; tracking calesthio/OpenMontage baseline"
     },
     "torch": {
       "deferredLatest": "2.14.1",
+      "reviewed": "2026-10-09",
+      "revisit": "2026-11-09",
       "reason": "upstream GPU runtime compatibility floor; tracking calesthio/OpenMontage baseline"
     },
     "torchaudio": {
       "deferredLatest": "2.11.0",
+      "reviewed": "2026-10-09",
+      "revisit": "2026-11-09",
       "reason": "upstream GPU runtime compatibility floor; tracking calesthio/OpenMontage baseline"
     },
     "torchvision": {
       "deferredLatest": "0.29.1",
+      "reviewed": "2026-10-09",
+      "revisit": "2026-11-09",
       "reason": "upstream GPU runtime compatibility floor; tracking calesthio/OpenMontage baseline"
     }
   }
