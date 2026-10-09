@@ -14,11 +14,11 @@
       "reason": "maintainer test suite baseline; keeps minimum compatibility floor"
     },
     "ruff": {
-      "deferredLatest": "0.16.9",
+      "deferredLatest": "0.16.10",
       "reason": "maintainer linter baseline; bump tested separately from product changes"
     },
     "pydantic": {
-      "deferredLatest": "2.13.5",
+      "deferredLatest": "2.14.0",
       "reason": "upstream runtime compatibility floor; tracking calesthio/OpenMontage baseline"
     },
     "jsonschema": {
@@ -42,19 +42,19 @@
       "reason": "upstream runtime compatibility floor; tracking calesthio/OpenMontage baseline"
     },
     "google-auth": {
-      "deferredLatest": "2.59.1",
+      "deferredLatest": "2.61.0",
       "reason": "upstream runtime compatibility floor; tracking calesthio/OpenMontage baseline"
     },
     "google-genai": {
-      "deferredLatest": "2.26.0",
+      "deferredLatest": "2.29.0",
       "reason": "upstream runtime compatibility floor; tracking calesthio/OpenMontage baseline"
     },
     "openai": {
-      "deferredLatest": "3.22.1",
+      "deferredLatest": "3.26.1",
       "reason": "upstream runtime compatibility floor; tracking calesthio/OpenMontage baseline"
     },
     "fastapi": {
-      "deferredLatest": "0.142.2",
+      "deferredLatest": "0.143.0",
       "reason": "upstream runtime compatibility floor; tracking calesthio/OpenMontage baseline"
     },
     "uvicorn": {
