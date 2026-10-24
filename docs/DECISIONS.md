@@ -234,9 +234,9 @@
 - 該目錄沒有 lockfile，也不在 CI 與測試之中；唯一用法是 `SKILL.md`／`README` 描述、由人手動執行的 `npm install && npm run render` 基線渲染。
 - `Root.tsx`、`Stargazed.tsx` 只用 `z.object`／`z.array`／`z.string`／`z.number` 宣告靜態 props 形狀，並驗證寫死的 `defaultProps`，不處理任何外部輸入。
 - 產品的 `remotion-composer` 用 zod 4.6.7（見 `remotion-composer/package.json` 的 override），這個 fixture 不被產品打包。
-- 升到 4.x 會破壞 Remotion 4.x 對 zod 3 的 peer 相依，等於把基線渲染 fixture 弄壞。
+- 修補版 4.6.6 是 4.x：fixture 的 `z.object`／`z.array` 寫法在 4.x 大概可用，但沒有人實際重跑過基線渲染，不在未驗證時改動測試資料；Remotion 最新版本自身已相依 zod 4.x（見上方 override 說明），所以這份 `^3.22.0` 宣告本來就與最新 Remotion 不同調。
 
-**重新評估的觸發條件**（任一成立）：fixture 被納入 CI；加了 lockfile；開始處理外部輸入；Remotion 支援 zod 4。
+**重新評估的觸發條件**（任一成立）：fixture 被納入 CI；加了 lockfile；開始處理外部輸入；有人要重跑基線渲染時（屆時順手改成 `^4.6.6` 並實測）。
 
 ### 六、Issue（18）：採用 2、略過 3、延後 13
 
