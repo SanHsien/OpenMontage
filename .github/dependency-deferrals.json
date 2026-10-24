@@ -20,15 +20,15 @@
       "reason": "maintainer test suite baseline; keeps minimum compatibility floor"
     },
     "ruff": {
-      "deferredLatest": "0.16.10",
-      "reviewed": "2026-10-09",
-      "revisit": "2026-11-09",
+      "deferredLatest": "0.17.2",
+      "reviewed": "2026-10-24",
+      "revisit": "2026-11-24",
       "reason": "maintainer linter baseline; bump tested separately from product changes"
     },
     "pydantic": {
-      "deferredLatest": "2.14.0",
-      "reviewed": "2026-10-09",
-      "revisit": "2026-11-09",
+      "deferredLatest": "2.14.1",
+      "reviewed": "2026-10-24",
+      "revisit": "2026-11-24",
       "reason": "upstream runtime compatibility floor; tracking calesthio/OpenMontage baseline"
     },
     "jsonschema": {
@@ -44,15 +44,15 @@
       "reason": "upstream runtime compatibility floor; tracking calesthio/OpenMontage baseline"
     },
     "Pillow": {
-      "deferredLatest": "12.3.0",
-      "reviewed": "2026-10-09",
-      "revisit": "2026-11-09",
+      "deferredLatest": "13.0.0",
+      "reviewed": "2026-10-24",
+      "revisit": "2026-11-24",
       "reason": "upstream runtime compatibility floor; tracking calesthio/OpenMontage baseline"
     },
     "numpy": {
-      "deferredLatest": "2.5.3",
-      "reviewed": "2026-10-09",
-      "revisit": "2026-11-09",
+      "deferredLatest": "2.5.4",
+      "reviewed": "2026-10-24",
+      "revisit": "2026-11-24",
       "reason": "upstream runtime compatibility floor; tracking calesthio/OpenMontage baseline"
     },
     "requests": {
@@ -62,27 +62,27 @@
       "reason": "upstream runtime compatibility floor; tracking calesthio/OpenMontage baseline"
     },
     "google-auth": {
-      "deferredLatest": "2.61.0",
-      "reviewed": "2026-10-09",
-      "revisit": "2026-11-09",
+      "deferredLatest": "2.62.0",
+      "reviewed": "2026-10-24",
+      "revisit": "2026-11-24",
       "reason": "upstream runtime compatibility floor; tracking calesthio/OpenMontage baseline"
     },
     "google-genai": {
-      "deferredLatest": "2.29.0",
-      "reviewed": "2026-10-09",
-      "revisit": "2026-11-09",
+      "deferredLatest": "2.33.0",
+      "reviewed": "2026-10-24",
+      "revisit": "2026-11-24",
       "reason": "upstream runtime compatibility floor; tracking calesthio/OpenMontage baseline"
     },
     "openai": {
-      "deferredLatest": "3.26.1",
-      "reviewed": "2026-10-09",
-      "revisit": "2026-11-09",
+      "deferredLatest": "3.37.0",
+      "reviewed": "2026-10-24",
+      "revisit": "2026-11-24",
       "reason": "upstream runtime compatibility floor; tracking calesthio/OpenMontage baseline"
     },
     "fastapi": {
-      "deferredLatest": "0.143.0",
-      "reviewed": "2026-10-09",
-      "revisit": "2026-11-09",
+      "deferredLatest": "0.162.0",
+      "reviewed": "2026-10-24",
+      "revisit": "2026-11-24",
       "reason": "upstream runtime compatibility floor; tracking calesthio/OpenMontage baseline"
     },
     "uvicorn": {
