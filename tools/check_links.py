@@ -34,7 +34,7 @@ MAINTAINED_DOCUMENTS = (
     "docs/DEVELOPMENT.md",
     "docs/DECISIONS.md",
     "docs/UPSTREAM.md",
-    ".github/pull_request_template.md",
+    ".github/PULL_REQUEST_TEMPLATE.md",
 )
 
 
