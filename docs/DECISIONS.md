@@ -141,3 +141,22 @@
 | Issue #664 | 不適用 | 功能請求（新增 Magnific provider），非缺陷 |
 
 **基準線**：`tools/upstream_baseline.json` 推進至 PR 687、Issue 664、日期 2026-09-30。Baseline 代表已審查，未代表已合併。
+
+
+## 2026-10-24：修補 Dependabot 警示 #8 與 `remotion-composer` 鎖檔的 audit 結果
+
+**決定**：只動 `remotion-composer/package.json` 與 `remotion-composer/package-lock.json`，沒有改任何產品程式碼。鎖檔由 `npm update ... --package-lock-only --ignore-scripts` 與 `npm install --package-lock-only --ignore-scripts` 重新產生。
+
+| 套件 | 舊 → 新 | 對應 |
+| --- | --- | --- |
+| `postcss-selector-parser` | 7.1.4 → 7.1.7 | Dependabot #8（medium，GHSA-rj75-hqrm-r3gf）；Dependabot PR #4 只升到 7.1.6，保持開啟 |
+| `source-map-js` | 1.2.1 → 1.2.2 | `npm audit` high（GHSA-68fv-2mgg-jv7q），無 Dependabot 警示 |
+| `fast-uri` | 3.1.7 → 3.1.9 | `npm audit` moderate（五則 GHSA），在 `^3.1.7` 範圍內 |
+| `zod` | 4.3.6 → 4.6.7 | `npm audit` high（GHSA-mrhx-c7xc-m3w5），以 `overrides` 強制 |
+
+**`zod` 為什麼用 override**：`zod` 只由 `@remotion/studio` 與 `@remotion/media` 以精確版本 `4.3.6` 相依；Remotion 最新版 4.0.538 也只升到 4.5.4，仍在受影響範圍（`< 4.6.6`），所以沒有可升的修補版 Remotion。Remotion 沒有把 `zod` 打包進自己的 dist（`@remotion/studio` 在執行時載入專案解析到的 `zod`），因此 override 真的改變執行時的 `zod`，不只是讓掃描器看不到。專案的 `src/` 沒有任何 `zod` 引用。
+**代價**：Remotion 會在每次 `remotion` 指令印出「zod: installed 4.6.7, required 4.3.6」的版本不一致警告，宣稱可能造成 zod 型別相關功能異常。若日後在 Remotion Studio 的 schema 編輯器遇到問題，先移除這行 override 驗證；Remotion 釋出支援 `zod >= 4.6.6` 的版本後，刪掉 override。
+
+**驗證**：`npm ci --ignore-scripts` 後 `npm audit` 為 0 個弱點（升級前 9 個：2 moderate、7 high）。lock diff 只有四個套件版本變動，無新增／移除套件、無新 install script、`resolved` 皆為官方 registry。在暫存副本（不入版控）手動補上 `CaptionOverlay.tsx` 缺少的 `>` 之後，`tsc --noEmit` 無錯誤，`remotion bundle src/index.tsx` 成功，只多上述警告。
+**既有問題（未修，非本次範圍）**：`remotion-composer/src/components/CaptionOverlay.tsx` 第 126 行的 `<span style={{...}}` 少了結尾 `>`，造成 `tsc` 11 個語法錯誤與 `remotion bundle` 失敗；問題從 v1.0.0 初始提交就存在，與依賴無關。
+**未涵蓋**：根目錄 `requirements*.txt` 都只有下限（`>=`）沒有釘版，沒有鎖檔可供 `pip-audit` 檢查，因此 Python 端沒有做弱點掃描。
