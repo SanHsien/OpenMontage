@@ -8,6 +8,7 @@ the standard library.
 from __future__ import annotations
 
 import json
+import re
 import time
 from pathlib import Path
 from typing import Any
@@ -21,6 +22,52 @@ from tools.base_tool import (
     ToolStability,
     ToolTier,
 )
+
+
+def _is_cjk_char(ch: str) -> bool:
+    """True for ideographs, kana and CJK/fullwidth punctuation.
+
+    Hangul is excluded on purpose: Korean separates words with spaces.
+    """
+    cp = ord(ch)
+    return (
+        0x3000 <= cp <= 0x30FF       # CJK punctuation, hiragana, katakana
+        or 0x3400 <= cp <= 0x4DBF    # CJK extension A
+        or 0x4E00 <= cp <= 0x9FFF    # CJK unified ideographs
+        or 0xF900 <= cp <= 0xFAFF    # CJK compatibility ideographs
+        or 0xFF00 <= cp <= 0xFFEF    # fullwidth forms
+        or 0x20000 <= cp <= 0x2FA1F  # CJK extensions B-F, compat supplement
+    )
+
+
+_TAG_RE = re.compile(r"<[^>]*>")
+
+
+def _join_tokens(tokens: list[str]) -> str:
+    """Join tokens with a space, except between two adjacent CJK characters.
+
+    ASR engines that emit one token per Chinese/Japanese character would
+    otherwise yield "人 工 智 能". Latin words keep their spaces, and a Latin
+    word next to a CJK character keeps one too. Markup such as the karaoke
+    ``<b>…</b>`` wrapper is ignored when looking at the token edges.
+    """
+    out = ""
+    for tok in tokens:
+        tok = tok.strip()
+        if not tok:
+            continue
+        if out:
+            prev_visible = _TAG_RE.sub("", out).rstrip()
+            next_visible = _TAG_RE.sub("", tok).lstrip()
+            if not (
+                prev_visible
+                and next_visible
+                and _is_cjk_char(prev_visible[-1])
+                and _is_cjk_char(next_visible[0])
+            ):
+                out += " "
+        out += tok
+    return out
 
 
 class SubtitleGen(BaseTool):
@@ -152,7 +199,7 @@ class SubtitleGen(BaseTool):
                     w["word"] = corr[stripped] + trailing
             # Also fix segment-level text
             if "text" in seg and words:
-                seg["text"] = " ".join(w["word"] for w in words)
+                seg["text"] = _join_tokens([w["word"] for w in words])
             elif "text" in seg:
                 for wrong, right in corr.items():
                     import re as _re
@@ -192,7 +239,7 @@ class SubtitleGen(BaseTool):
 
         for w in all_words:
             word_text = w["word"].strip()
-            candidate = f"{buf_text} {word_text}".strip() if buf_text else word_text
+            candidate = _join_tokens([buf_text, word_text]) if buf_text else word_text
 
             if buf and (len(buf) >= max_words or len(candidate) > max_chars):
                 cues.append({
@@ -209,7 +256,7 @@ class SubtitleGen(BaseTool):
                 buf_text = ""
 
             buf.append(w)
-            buf_text = f"{buf_text} {word_text}".strip() if buf_text else word_text
+            buf_text = _join_tokens([buf_text, word_text]) if buf_text else word_text
 
         # Flush remaining
         if buf:
@@ -261,7 +308,7 @@ class SubtitleGen(BaseTool):
                             parts.append(f"<b>{w['word']}</b>")
                         else:
                             parts.append(w["word"])
-                    lines.append(" ".join(parts))
+                    lines.append(_join_tokens(parts))
                     lines.append("")
         else:
             for cue in cues:
@@ -299,7 +346,7 @@ class SubtitleGen(BaseTool):
                             parts.append(f"<b>{w['word']}</b>")
                         else:
                             parts.append(w["word"])
-                    lines.append(" ".join(parts))
+                    lines.append(_join_tokens(parts))
                     lines.append("")
         else:
             for cue in cues:

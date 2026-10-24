@@ -387,6 +387,8 @@ class VideoCompose(BaseTool):
                 ],
                 stderr=subprocess.STDOUT,
                 text=True,
+                encoding="utf-8",
+                errors="replace",
             )
             return "audio" in out
         except Exception:
@@ -2322,7 +2324,10 @@ class VideoCompose(BaseTool):
                 "ffprobe", "-v", "quiet", "-print_format", "json",
                 "-show_format", "-show_streams", str(output_path),
             ]
-            proc = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+            proc = subprocess.run(
+                cmd, capture_output=True, text=True,
+                encoding="utf-8", errors="replace", timeout=30,
+            )
             if proc.returncode == 0:
                 probe_data = json.loads(proc.stdout)
                 fmt = probe_data.get("format", {})
@@ -2421,9 +2426,17 @@ class VideoCompose(BaseTool):
                     if frame_path.exists():
                         frame_paths.append(str(frame_path))
 
-                        # Check for black frames (file size heuristic:
-                        # a 1920x1080 PNG of pure black is ~5KB)
-                        if frame_path.stat().st_size < 2000:
+                        # Check for black frames by mean luminance. A file
+                        # size test cannot work: a pure-black 1920x1080 PNG
+                        # extracted by ffmpeg weighs ~8.6 KB, far above any
+                        # sensible cutoff, so the old heuristic never fired.
+                        from PIL import Image
+
+                        with Image.open(frame_path) as frame_img:
+                            hist = frame_img.convert("L").histogram()
+                        total = sum(hist) or 1
+                        mean_luma = sum(i * n for i, n in enumerate(hist)) / total
+                        if mean_luma < 6.0:
                             visual_spotcheck["black_frames_detected"] = True
 
                 visual_spotcheck["frames_sampled"] = len(frame_paths)
@@ -2459,7 +2472,8 @@ class VideoCompose(BaseTool):
                     "-af", "volumedetect", "-f", "null", "-",
                 ]
                 proc = subprocess.run(
-                    cmd, capture_output=True, text=True, timeout=60
+                    cmd, capture_output=True, text=True,
+                    encoding="utf-8", errors="replace", timeout=60,
                 )
                 stderr = proc.stderr or ""
                 # Parse mean_volume and max_volume
@@ -2614,7 +2628,8 @@ class VideoCompose(BaseTool):
                         str(output_path),
                     ]
                     proc = subprocess.run(
-                        cmd, capture_output=True, text=True, timeout=15
+                        cmd, capture_output=True, text=True,
+                        encoding="utf-8", errors="replace", timeout=15,
                     )
                     if proc.returncode == 0:
                         sub_data = json.loads(proc.stdout)

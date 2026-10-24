@@ -132,6 +132,11 @@ class PiperTTS(BaseTool):
             input=inputs["text"],
             capture_output=True,
             text=True,
+            # Piper reads stdin as UTF-8. Without an explicit encoding Python
+            # uses the Windows ANSI code page (cp950/cp936/cp1252), which
+            # garbles CJK and accented narration before it reaches Piper.
+            encoding="utf-8",
+            errors="replace",
             timeout=300,
         )
 
