@@ -263,6 +263,7 @@ Windows 11、Python 3.14.9，在乾淨的 venv（`requirements-dev.txt`）內，
 | `remotion-composer`：`npm ci --ignore-scripts` | exit 0，`found 0 vulnerabilities` |
 | `remotion-composer`：`npx tsc --noEmit` | exit 0 |
 | `remotion-composer`：`npx remotion bundle src/index.tsx` | exit 0（含新的 woff2 字型 import） |
+| `python tools/check_upstream_updates.py --strict`（水位推進後） | exit 0，三個面向皆「No new … above」；`tools/tests/test_fork_docs.py` 原先寫死舊的 `reviewed_through` SHA，水位一動必紅，改為只驗證 40 位十六進位格式 |
 
 **排除**：`tests/qa/test_08_end_to_end.py` 在 import 階段就跑完整個端到端腳本（所有輸出階段皆 `[PASS]`），然後在清理暫存檔時因 Windows 檔案被占用 `PermissionError [WinError 32]` 使收集失敗；該檔上游未動，與本次變更無關，所以從全量排除。
 
