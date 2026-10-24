@@ -160,3 +160,11 @@
 **驗證**：`npm ci --ignore-scripts` 後 `npm audit` 為 0 個弱點（升級前 9 個：2 moderate、7 high）。lock diff 只有四個套件版本變動，無新增／移除套件、無新 install script、`resolved` 皆為官方 registry。在暫存副本（不入版控）手動補上 `CaptionOverlay.tsx` 缺少的 `>` 之後，`tsc --noEmit` 無錯誤，`remotion bundle src/index.tsx` 成功，只多上述警告。
 **既有問題（未修，非本次範圍）**：`remotion-composer/src/components/CaptionOverlay.tsx` 第 126 行的 `<span style={{...}}` 少了結尾 `>`，造成 `tsc` 11 個語法錯誤與 `remotion bundle` 失敗；問題從 v1.0.0 初始提交就存在，與依賴無關。
 **未涵蓋**：根目錄 `requirements*.txt` 都只有下限（`>=`）沒有釘版，沒有鎖檔可供 `pip-audit` 檢查，因此 Python 端沒有做弱點掃描。
+
+
+## 2026-10-24：修正 `CaptionOverlay.tsx` 未關閉的 `<span>` 開始標籤
+
+**發現**：`remotion-composer/src/components/CaptionOverlay.tsx` 第 126 行 `<span style={{...}}` 少了結尾 `>`，從 v1.0.0 初始提交就存在。`npx tsc --noEmit` 回報 11 個語法錯誤（第 127～145 行，全部是同一個缺漏造成的連鎖），`npx remotion bundle src/index.tsx` 在 esbuild 階段失敗（`127:17: ERROR: Expected "..." but found "w"`）。
+**修正**：只在第 126 行 `}}` 後補上 `>`，沒有改動其他邏輯或 JSX 結構。
+**驗證**：`npm ci --ignore-scripts` 安裝後，`npx tsc --noEmit` 為 0 錯誤；`npx remotion bundle src/index.tsx` 成功，只有既有的 zod 版本不一致警告（見上一條）。
+**後續建議（未實作）**：目前 CI 沒有任何 job 對 `remotion-composer` 跑 `tsc`，這類語法錯誤才會在 main 上存在這麼久；建議另開變更，在 CI 加一個 `npm ci --ignore-scripts && npx tsc --noEmit` 的 job。
