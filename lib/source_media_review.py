@@ -92,11 +92,22 @@ def _probe_video(path: Path, tool_registry: Any) -> dict[str, Any]:
                 "input_path": str(path),
                 "strategy": "timestamps",
                 "timestamps": timestamps,
-                "output_dir": str(path.parent / ".source_review_frames"),
+                # Namespaced per source file: the tool writes a fixed
+                # frame_NNNN.jpg set, so a shared directory lets each video
+                # overwrite the previous one's frames.
+                "output_dir": str(path.parent / f".source_review_frames_{path.stem}"),
             })
             if sample_result.success:
+                # The frame list lives under "frames" (not "frame_paths"), as
+                # objects of {"path", "timestamp_seconds", "index"}. The
+                # artifact schema declares representative_frames as an array
+                # of path strings, so unwrap to paths or the artifact fails
+                # validation.
+                frames = sample_result.data.get("frames", [])
                 result["representative_frames"] = [
-                    frame["path"] for frame in sample_result.data.get("frames", [])
+                    str(frame["path"])
+                    for frame in frames
+                    if isinstance(frame, dict) and frame.get("path")
                 ]
     except Exception as e:
         logger.warning("frame_sampler failed for %s: %s", path, e)

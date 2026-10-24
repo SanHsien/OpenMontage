@@ -114,6 +114,12 @@
       "reviewed": "2026-10-09",
       "revisit": "2026-11-09",
       "reason": "upstream GPU runtime compatibility floor; tracking calesthio/OpenMontage baseline"
+    },
+    "websockets": {
+      "deferredLatest": "17.3",
+      "reviewed": "2026-10-24",
+      "revisit": "2026-11-24",
+      "reason": "upstream runtime compatibility floor (Eleven v4 Turbo and realtime audio transports, calesthio/OpenMontage e01dbf4); the realtime transport tests pass on 17.3, so the floor stays at upstream's 14.0"
     }
   }
 }
