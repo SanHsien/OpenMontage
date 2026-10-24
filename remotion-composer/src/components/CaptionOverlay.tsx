@@ -123,7 +123,7 @@ const PageRenderer: React.FC<{
                   textShadow: isActive
                     ? `0 0 20px ${highlightColor}66, 0 2px 4px rgba(0,0,0,0.5)`
                     : "0 2px 4px rgba(0,0,0,0.5)",
-                }}
+                }}>
                 {w.word}
                 {/* A plain " " inside an inline-block gets trimmed away by the
                     browser, which glues space-delimited words together
