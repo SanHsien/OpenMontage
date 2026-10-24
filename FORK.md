@@ -21,7 +21,7 @@
 | `README.md` | 繁中主檔；加入 fork 維護資訊與快速入口 |
 | `README.en.md` | 英文鏡像；加入 fork 維護資訊 |
 | `README_zh-CN.md` | 上游簡體中文說明文件保留 |
-| `AGENTS.md` / `CLAUDE.md` / `GEMINI.md` | 本 fork 的 AI 維護單一真相源（載明 Windows 原生規範） |
+| `AGENTS.md` / `CLAUDE.md` | 本 fork 的 AI 維護單一真相源（載明 Windows 原生規範） |
 | `NOTICE.md` / `FORK.md` / `LICENSE` | 來源、授權與同步說明 |
 | `tools/dev_check.ps1` | Windows 本機一鍵 gate（維護工具，不安裝重型依賴） |
 | `tools/bootstrap_dev.ps1` | Windows 本機一鍵初始化與驗收（支援 `-All` 參數安裝產品依賴） |
