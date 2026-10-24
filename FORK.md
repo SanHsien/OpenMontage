@@ -33,6 +33,7 @@
 | `.github/workflows/codeql.yml` | CodeQL 安全掃描工作流程 |
 | `docs/DECISIONS.md`、`docs/UPSTREAM.md`、`docs/DEVELOPMENT.md` | fork 維護文件 |
 | `REVIEW.md` | 全庫風險快照 |
+| `tests/contracts/test_phase0_contracts.py` | 平台指令檔清單移除 `CLAUDE.md`（本 fork 只維護 `AGENTS.md`） |
 
 核心模組在 `tools/`、流水線定義在 `pipeline_defs/`、技能庫在 `skills/`、Remotion 合成在 `remotion-composer/`，以上游為準。
 
