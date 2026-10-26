@@ -10,6 +10,11 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "remotion": "^4.0.0",
-    "zod": "^3.22.0"
+    "zod": "4.6.7"
+  },
+  "overrides": {
+    "@remotion/cli": {
+      "zod": "4.6.7"
+    }
   }
 }

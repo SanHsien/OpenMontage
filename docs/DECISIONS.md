@@ -238,6 +238,18 @@
 
 **重新評估的觸發條件**（任一成立）：fixture 被納入 CI；加了 lockfile；開始處理外部輸入；有人要重跑基線渲染時（屆時順手改成 `^4.6.6` 並實測）。
 
+## 2026-10-26：修補 tier-3 Remotion corpus 的 zod Dependabot 警示 #9
+
+**決定**：將 `.agents/skills/remotion-to-hyperframes/assets/test-corpus/tier-3-data-driven/remotion-src/package.json` 的直接相依由 `zod ^3.22.0` 改為精準安全版本 `zod 4.6.7`，並以局部 npm override 將 `@remotion/cli` 子樹的 zod 固定為 `4.6.7`；不新增 corpus lockfile。
+
+**理由**：GitHub Advisory `GHSA-mrhx-c7xc-m3w5`（CVE-2023-54404）確認 `< 4.6.6` 皆受高風險記憶體耗盡弱點影響。這份 corpus 會由 eval 的基線 render 安裝及執行；原先的寬鬆範圍加上無 lockfile，無法可靠識別實際安裝版本。`4.6.7` 是首個修補版本 `4.6.6` 以上、且已由本 repo 的 `remotion-composer` 安全 override 使用的同一修補線。精準 pin 讓 corpus 安裝時可決定性地取得已驗證的安全版本，而不以提高下限或隱藏警示為目的。
+
+**巢狀相依重新檢查**：直接 pin 後的隔離 `npm ls zod --all` 發現 `@remotion/cli 4.0.538` 仍帶有 6 個 `zod 4.5.4`（仍在受影響範圍）。eval 與 tier-3 README 都使用 npm，因此改以 `@remotion/cli` 的局部 override 覆蓋這條 Remotion 4.x 子樹，不影響任何其他 zod consumer。重裝後，6 個位置皆為 deduped 的 `zod 4.6.7`；隔離暫時 lockfile 的 `npm audit --omit=dev --json` 為 0 個弱點且沒有 zod 項目。
+
+**相容性驗證**：在工作樹外的隔離副本以 `npm install --ignore-scripts --no-audit --no-fund --package-lock=false` 安裝 `zod 4.6.7` 與 corpus 同一組 Remotion/React 相依；補足 React 18 型別後，`npx --no-install tsc --noEmit` 成功。以原始 `stargazedSchema` 與 `Root.tsx` 的既有 `defaultProps` 驗證：合法預設 props 通過，將 `stats[0].value` 改成字串的非法 props 被拒絕。未啟動影片 render、外部圖像 API 或產出基線檔案。
+
+**範圍**：保留現有離線測試與 corpus 結構；不新增大型 lockfile，也未對 CodeQL #22 進行 dismiss。
+
 ### 六、Issue（18）：採用 2、略過 3、延後 13
 
 | 項目 | 結論 | 證據與觸發條件 |
