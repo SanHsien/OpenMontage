@@ -126,6 +126,31 @@ class TestBacklotServerApi:
         response = client.get("/media/film/%2E%2E/project.json")
         assert response.status_code == 403
 
+    @pytest.mark.parametrize("route", ["media", "thumb"])
+    def test_media_rejects_escape_into_sibling_with_same_prefix(self, client, projects_root, route):
+        # A bare string-prefix check treats projects/film-private as inside
+        # projects/film, so ../film-private/... used to be served.
+        _make_project(projects_root, "film")
+        secret = _make_project(projects_root, "film-private") / "renders" / "secret.png"
+        Image.new("RGB", (8, 8)).save(secret)
+
+        response = client.get(f"/{route}/film/%2E%2E/film-private/renders/secret.png")
+
+        assert response.status_code == 403
+
+    def test_media_rejects_symlink_out_of_project(self, client, projects_root, tmp_path):
+        project = _make_project(projects_root, "film")
+        outside = tmp_path / "outside.png"
+        Image.new("RGB", (8, 8)).save(outside)
+        try:
+            (project / "renders" / "link.png").symlink_to(outside)
+        except OSError:
+            pytest.skip("creating symlinks needs Developer Mode or admin on Windows")
+
+        response = client.get("/media/film/renders/link.png")
+
+        assert response.status_code == 403
+
     def test_media_serves_range_requests(self, client, projects_root):
         project = _make_project(projects_root, "film")
         media = project / "renders" / "final.mp4"

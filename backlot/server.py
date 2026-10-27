@@ -245,13 +245,7 @@ def create_app() -> FastAPI:
 
     @app.get("/thumb/{project_id}/{file_path:path}")
     async def thumb(project_id: str, file_path: str, w: int = 640) -> FileResponse:
-        project_dir = _safe_project_dir(project_id)
-        base_path = os.path.normpath(str(project_dir))
-        fullpath = os.path.normpath(os.path.join(base_path, file_path))
-        if not fullpath.startswith(base_path):
-            raise HTTPException(status_code=403, detail="path escapes project")
-        if not os.path.isfile(fullpath):
-            raise HTTPException(status_code=404, detail="media not found")
+        fullpath = _project_file(_safe_project_dir(project_id), file_path)
         target = Path(fullpath)
         width = min(THUMB_WIDTHS, key=lambda x: abs(x - w))
         cached = await asyncio.to_thread(_thumbnail_for, target, width)
@@ -267,14 +261,7 @@ def create_app() -> FastAPI:
 
     @app.get("/media/{project_id}/{file_path:path}")
     async def media(project_id: str, file_path: str) -> FileResponse:
-        project_dir = _safe_project_dir(project_id)
-        base_path = os.path.normpath(str(project_dir))
-        fullpath = os.path.normpath(os.path.join(base_path, file_path))
-        if not fullpath.startswith(base_path):
-            raise HTTPException(status_code=403, detail="path escapes project")
-        if not os.path.isfile(fullpath):
-            raise HTTPException(status_code=404, detail="media not found")
-        target = Path(fullpath)
+        fullpath = _project_file(_safe_project_dir(project_id), file_path)
         return FileResponse(fullpath)
 
     # ---- UI ------------------------------------------------------------
@@ -325,6 +312,22 @@ def _safe_project_dir(project_id: str) -> Path:
     if not os.path.isdir(fullpath):
         raise HTTPException(status_code=404, detail=f"unknown project: {project_id}")
     return Path(fullpath)
+
+
+def _project_file(project_dir: Path, file_path: str) -> str:
+    """Resolve a media path and refuse anything outside ``project_dir``.
+
+    realpath follows symlinks, and the prefix includes the separator so a
+    sibling such as ``projects/film-private`` is not mistaken for a path
+    inside ``projects/film``.
+    """
+    base_path = os.path.realpath(str(project_dir))
+    fullpath = os.path.realpath(os.path.join(base_path, file_path))
+    if not os.path.normcase(fullpath).startswith(os.path.normcase(os.path.join(base_path, ""))):
+        raise HTTPException(status_code=403, detail="path escapes project")
+    if not os.path.isfile(fullpath):
+        raise HTTPException(status_code=404, detail="media not found")
+    return fullpath
 
 
 def _sse(payload: dict) -> str:
