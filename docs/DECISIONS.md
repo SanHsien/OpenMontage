@@ -393,3 +393,54 @@ Windows 11、Python 3.14.9，在乾淨的 venv（`requirements-dev.txt`）內，
 | #844 | open | +122/-13 2檔 | 延後 | 10/12 | fix(hyperframes_compose): accept a warm npx cache when the r；缺陷修正；觸發=上游合併或 fork 命中該情境 |
 | #847 | open | +1774/-41 9檔 | 延後 | 31/31 | feat(dashscope): add Qwen voice cloning and cloned-voice TTS；新功能；觸發=上游合併後比對 |
 | #848 | open | +382/-15 4檔 | 延後 | 14/14 | feat(dashscope_image): add Qwen-Image 3.0 / 2.1 models；新功能；觸發=上游合併後比對 |
+
+## 2026-10-28：上游審查（PR #849–#863、Issue #854–#856；commit 無新進）
+
+**範圍**：上游 `main` 仍在 `e01dbf4`，沒有新 commit。`--state all` 列出 11 筆 PR（1 筆關閉未合併、10 筆開放、0 筆已合併）與 3 筆 Issue（皆開放），逐筆分類，水位推進到 PR #863、Issue #856。沒有對上游留言、開 PR 或 push。
+
+**方法**：取每筆 PR **目前**的 head（下表）抓 diff。隱藏內容掃描（`\S\s{40,}\S`、`eval(`／`new Function(`／`globalThis[`／`atob(`／`fromCharCode`、超過 400 字元的新增行）：11 筆皆 0 命中，超長行只有 #849、#862 的 Markdown 段落。再掃新增行的 Windows／CJK 關鍵字，只有 #861 含 Windows 修正，其餘命中都是新程式本身寫 `encoding="utf-8"` 或內文的破折號。
+
+| 項目 | 狀態／head | 規模 | 結論 | 證據與觸發條件 |
+| --- | --- | --- | --- | --- |
+| PR #849 | closed `b5aaee3c7b` | +36/-1 2 檔 | 略過 | 新增 `local-voice-cloning` 技能文件（從原始碼建置 OmniVoice GGUF）；不是缺陷修正，上游未收 |
+| PR #850 | open `73e1b665eb` | +1389/-4 19 檔 | 延後 | YouTube／TikTok 上傳與排程自動發片，含新 workflow `autopilot-short.yml` 與平台 token 取得腳本；新功能。觸發=上游合併後比對 |
+| PR #851 | open `d12aea976c` | +81/-31 5 檔 | 延後 | 文件中的管線／工具數量同步與 `.python-version`；文件小修。觸發=上游合併 |
+| PR #852 | open `adf14b704b` | +2922/-16 11 檔 | 延後 | Kling O3 的 fal 影像／影片模式；新 provider。觸發=上游合併後比對 |
+| PR #857 | open `fd2197b051` | +383/-0 2 檔 | 延後 | Openverse 圖庫來源；新功能。觸發=上游合併後比對 |
+| PR #858 | open `4862c0ee83` | +19/-1 2 檔 | 延後 | `CinematicRenderer.tsx` 在 `playbackRate ≠ 1` 時不傳 `trimAfter`（對應 Issue #855）。fork 仍是舊寫法：`remotion-composer/src/CinematicRenderer.tsx:69-71` 無條件換算 `trimAfterSeconds`。上游 PR 的測試只比對原始碼字串，沒有實際渲染證據；本機沒有慢速片段可重現。觸發=上游合併，或 fork 實際用到 `playbackRate < 1` 的片段 |
+| PR #859 | open `80331e9c69` | +25/-8 1 檔 | 延後 | `transcriber.py` 對新版 PyAV 去掉 `metadata_errors` 參數。fork 的 `tools/analysis/transcriber.py` 沒有這段相容處理，`requirements*.txt` 也沒有釘 `av`。不照抄的原因：做法是在執行期替換 `faster_whisper.audio.av.open` 這個全域屬性，同一行程內並行轉錄會互相覆蓋。同 #696 transcriber 段，觸發=上游合併或本機以新 PyAV 重現 |
+| PR #860 | open `57454c778c` | +66/-0 4 檔 | 略過 | Dockerfile 與 Docker 文件；本線為 Windows 原生維護線（同 #692 macOS 安裝的處理） |
+| PR #861 | open `01ef8d3036` | +50/-27 3 檔 | 部分採用 | **Piper 段採用做法**（`52ccaa6`）：fork 先前移植 #842 時只修父行程那端；`pip install piper-tts` 的 Piper 是讀 `sys.stdin` 的 Python 程式，子行程在 Windows 仍用 ANSI 碼頁解碼，中文會被弄壞。現在傳 `PYTHONIOENCODING=utf-8` 給子行程，測試用讀 stdin 的替身 Piper 實跑，修前失敗。**`HeroTitle.tsx` 段略過**：改成 `title.split(" ")` 後每個字詞是 `nowrap`，沒有空格的中文標題會變成一整段不能換行，直式畫面會溢出；fork 現行的逐字排列（`HeroTitle.tsx:41`）對中文可正常換行。`StatCard` 字級屬性是新功能，延後 |
+| PR #862 | open `424a5ea4b9` | +225/-9 7 檔 | 延後 | 發布階段記錄「留言關鍵字」CTA；新功能。觸發=上游合併後比對 |
+| PR #863 | open `504d9b205a` | +93/-0 2 檔 | 延後 | 兩份 demo props 素材。觸發=上游合併後比對 |
+| Issue #854 | open | — | 略過 | 第三方分析報告公告，不是缺陷 |
+| Issue #855 | open | — | 延後 | 同 PR #858 |
+| Issue #856 | open | — | 略過 | 使用提示詞，不是缺陷 |
+
+**水位**：`tools/upstream_baseline.json` 的 `reviewed_pr_through` 848→863、`reviewed_issue_through` 819→856、`reviewed_date` 2026-10-28；`reviewed_through` 維持 `e01dbf4`（上游沒有新 commit）。
+
+## 2026-10-28：fork 自加程式深度掃描
+
+**範圍**：`git diff upstream/main HEAD` 中 fork 自己加或改的程式（67 檔、+3,828/-275），排除艦隊正本 `tools/check_upstream_updates.py`（只能改正本）與 lockfile。上游原有、fork 未動的程式不改。每個缺陷先寫修前會失敗的測試，一個缺陷一個 commit。
+
+| 位置 | 輸入 → 錯誤結果 | 處理 |
+| --- | --- | --- |
+| `tools/audio/piper_tts.py` | 中文旁白經 `pip` 版 Piper → 子行程以 ANSI 碼頁讀 stdin，文字變成替代字元 | 修（`52ccaa6`），見上節 #861 |
+| `backlot/server.py` `/media`、`/thumb` | `/media/film/../film-private/renders/secret.png` → 200；包含檢查是 `startswith(base_path)` 不含分隔符號，同前綴的兄弟專案被當成在專案內；改用 `normpath` 後也不再跟隨符號連結 | 修（`3ea6ae7`）：兩個路由共用 `_project_file()`，兩邊 `realpath`、前綴含分隔符號。符號連結測試在不能建連結的機器上略過 |
+| `tools/audio/music_selector.py` 成本上限 | `max_cost_tier="free"`（不是合法值）→ 退回最高等級，直接呼叫付費生成 | 修（`7acb628`）：不認得的值回錯誤 |
+| `tools/audio/music_selector.py` 音樂庫 | `library_dir` 指向有曲目的資料夾、預設資料夾是空的 → 跳過音樂庫去付費生成；`library_dir` 是空資料夾 → 回報「已取得」但 0 首曲目，不再試圖庫 | 修（`ae0464c`）：依 `library_dir` 判斷可用性，0 首曲目不算成功 |
+| `tools/video/stock_sources/pond5_pd.py` | `POND5_API_KEY="   "` → 判為可用並送出空的 Bearer；結尾換行的金鑰把換行帶進標頭 | 修（`40aa0a1`），與 Pexels／Pixabay 一致去除空白 |
+| `tools/check_links.py` | README 連到 `docs/decisions.md`（實際是 `DECISIONS.md`）→ Windows 上判為存在，GitHub 上是 404 | 修（`6594f0b`）：repo 內路徑逐段比對實際檔名大小寫 |
+| `remotion-composer/src/lib/fonts.ts` | `src: ["fonts/x.ttf"]` → `format('ttf')`，Chromium 不認得這個提示而跳過字型，中文退回拉丁字型 | 修（`64ad793`）：副檔名對應 `truetype`／`opentype`／`woff`／`woff2`，其他不加提示；測試以 Node 實跑 `fonts.ts`，`tsc --noEmit` 通過 |
+| `tools/bootstrap_dev.ps1` | gate 失敗 → 仍印「維護環境可用」並以 0 結束（PowerShell 不會因原生指令非 0 而中止） | 修（`0abaa5c`），`python -m venv` 一併檢查 |
+| CI 覆蓋 | `ci.yml` 只跑 `dev_check.ps1`（`tools/tests`），fork 為自己的產品修正寫的測試在 CI 上一個都沒跑 | 補（`6875bfd`）：`tools/test_fork_regressions.ps1` 列出這些測試檔，CI 在 gate 後執行；清單上的檔案不見會直接失敗 |
+
+**看過、不修**：
+
+- `tools/check_dependency_freshness.py`：延後紀錄 `deferredLatest: "17.3"` 時，PyPI 出 `17.3.1` 仍算延後中。這是刻意的「依宣告精度比較」，既有測試（`9.1` 涵蓋 `9.1.0`）釘住這個語意，不改。
+- `tools/video/hyperframes_compose.py`：`npm view` 結束碼 0 但沒有輸出時，fork 記成空版本，上游版本會判為錯誤。之後還有 `doctor` 實跑 CLI 確認可執行，不會誤判可用；只差在報告欄位，不修。
+- `tools/video/video_trimmer.py`：`_has_video_stream` 要求超過 1 幀，只有 1 幀的片段會被拒。這是為了擋 PR #642 修的「每段只剩 1 幀」問題刻意設的門檻，保留。
+- `tools/video/stock_sources/archive_org.py`、`wikimedia.py`：任一搜尋策略的網路錯誤會中止整個來源。這是 R-21（PR #652）刻意把錯誤傳給 `corpus_builder` 的設計。
+- `tools/_kling/account.py`：快取鍵用 10 萬次 PBKDF2，每次查用量多花數十毫秒；為了消 CodeQL 警示（R-27），功能正確，不改。
+
+**驗證**：Windows 11、Python 3.14.9、乾淨 venv（`requirements-dev.txt`）。`tools/dev_check.ps1` exit 0（`tools/tests` 32 passed、連結 16 份 0 斷鏈）；`tools/test_fork_regressions.ps1` 348 passed、1 skipped（符號連結）；`remotion-composer` `npm ci --ignore-scripts` 後 `npx tsc --noEmit` exit 0。

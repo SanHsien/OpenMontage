@@ -63,6 +63,20 @@ gh repo set-default --view
 | R-26 | P2 | 建立 main 分支保護規則：綁定 Windows CI 矩陣、CodeQL、Upstream check，禁止 force-push 與 deletion |
 | R-27 | P1 | 全面修復 GitHub Code Scanning 全部 17 個警示：包含 Kling 金鑰 PBKDF2 安全雜湊（CWE-327）、Backlot 伺服器路徑注入防護（CWE-22）與各模組 URL 網域名稱精準解析校驗（CWE-20） |
 
+### 2026-10-28 深度掃描補修（細節見 `docs/DECISIONS.md` 同日一節）
+
+| ID | 嚴重度 | 做了什麼 | 修復 commit |
+|---|---|---|---|
+| R-28 | P1 | R-27 的 Backlot 路徑防護用 `startswith` 不含分隔符號，`/media/film/../film-private/...` 可讀同前綴的兄弟專案，也不再擋符號連結；改為 `realpath` 加分隔符號前綴 | `3ea6ae7`（2026-10-28） |
+| R-29 | P2 | R-18 的 `music_selector`：不認得的 `max_cost_tier` 會放行付費生成 | `7acb628`（2026-10-28） |
+| R-30 | P2 | R-18 的 `music_selector`：`library_dir` 有曲目時被跳過去付費生成、空資料夾時回報已取得 0 首 | `ae0464c`（2026-10-28） |
+| R-31 | P2 | R-15 的 `fonts.ts`：多個字型來源用副檔名當 `format()`，`.ttf`／`.otf` 被 Chromium 跳過，中文字型載不進來 | `64ad793`（2026-10-28） |
+| R-32 | P2 | `piper_tts` 的 UTF-8 修正只做了父行程那端，`pip` 版 Piper 讀 stdin 仍用 ANSI 碼頁（上游 PR #861 的做法） | `52ccaa6`（2026-10-28） |
+| R-33 | P3 | R-22 的 Pond5：只有空白的金鑰被當成已設定 | `40aa0a1`（2026-10-28） |
+| R-34 | P3 | `check_links.py` 在 Windows 不分大小寫，GitHub 上 404 的連結會通過 | `6594f0b`（2026-10-28） |
+| R-35 | P3 | R-05 的 `bootstrap_dev.ps1`：gate 失敗仍以 0 結束 | `0abaa5c`（2026-10-28） |
+| R-36 | P2 | CI 只跑 `tools/tests`，fork 的產品回歸測試沒在 CI 跑；新增 `tools/test_fork_regressions.ps1` | `6875bfd`（2026-10-28） |
+
 ## 接受、不改契約
 
 | ID | 嚴重度 | 處理 |
