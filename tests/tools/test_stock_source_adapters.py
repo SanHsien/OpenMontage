@@ -195,6 +195,27 @@ def test_pond5_availability_requires_credentials(monkeypatch):
     assert source.is_available() is True
 
 
+def test_pond5_blank_key_counts_as_unset(monkeypatch):
+    # Same rule as the Pexels/Pixabay adapters: a whitespace-only key would
+    # otherwise mark Pond5 available and send "Bearer   ", which Pond5 rejects.
+    monkeypatch.setenv("POND5_API_KEY", "   ")
+    assert get_source("pond5_pd").is_available() is False
+
+
+def test_pond5_search_strips_the_configured_key(monkeypatch):
+    captured = {}
+
+    def fake_get(*_args, **kwargs):
+        captured.update(kwargs)
+        return _EmptyOkResponse()
+
+    _install_fake_transport(monkeypatch, fake_get)
+    monkeypatch.setenv("POND5_API_KEY", " test-pond5\n")
+    get_source("pond5_pd").search("ocean waves", SearchFilters(kind="video", per_page=5))
+
+    assert captured["headers"]["Authorization"] == "Bearer test-pond5"
+
+
 def test_pond5_search_sends_configured_credentials(monkeypatch):
     captured = {}
 

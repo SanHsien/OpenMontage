@@ -48,7 +48,7 @@ class Pond5PublicDomainSource:
     def is_available(self) -> bool:
         import os
 
-        return bool(os.environ.get("POND5_API_KEY"))
+        return bool(os.environ.get("POND5_API_KEY", "").strip())
 
     def search(self, query: str, filters: SearchFilters) -> list[Candidate]:
         import requests
@@ -72,7 +72,7 @@ class Pond5PublicDomainSource:
         headers: dict[str, str] = {
             "User-Agent": "OpenMontage/1.0 (stock source adapter)",
         }
-        api_key = os.environ.get("POND5_API_KEY")
+        api_key = os.environ.get("POND5_API_KEY", "").strip()
         if api_key:
             headers["Authorization"] = f"Bearer {api_key}"
 
