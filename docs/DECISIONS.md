@@ -413,6 +413,7 @@ Windows 11、Python 3.14.9，在乾淨的 venv（`requirements-dev.txt`）內，
 | PR #861 | open `01ef8d3036` | +50/-27 3 檔 | 部分採用 | **Piper 段採用做法**（`52ccaa6`）：fork 先前移植 #842 時只修父行程那端；`pip install piper-tts` 的 Piper 是讀 `sys.stdin` 的 Python 程式，子行程在 Windows 仍用 ANSI 碼頁解碼，中文會被弄壞。現在傳 `PYTHONIOENCODING=utf-8` 給子行程，測試用讀 stdin 的替身 Piper 實跑，修前失敗。**`HeroTitle.tsx` 段略過**：改成 `title.split(" ")` 後每個字詞是 `nowrap`，沒有空格的中文標題會變成一整段不能換行，直式畫面會溢出；fork 現行的逐字排列（`HeroTitle.tsx:41`）對中文可正常換行。`StatCard` 字級屬性是新功能，延後 |
 | PR #862 | open `424a5ea4b9` | +225/-9 7 檔 | 延後 | 發布階段記錄「留言關鍵字」CTA；新功能。觸發=上游合併後比對 |
 | PR #863 | open `504d9b205a` | +93/-0 2 檔 | 延後 | 兩份 demo props 素材。觸發=上游合併後比對 |
+| #853 | 不存在 | — | 無需動作 | `gh api repos/calesthio/OpenMontage/issues/853` 回 404（已刪除），PR 與 Issue 清單都沒有它 |
 | Issue #854 | open | — | 略過 | 第三方分析報告公告，不是缺陷 |
 | Issue #855 | open | — | 延後 | 同 PR #858 |
 | Issue #856 | open | — | 略過 | 使用提示詞，不是缺陷 |

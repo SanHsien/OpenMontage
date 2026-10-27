@@ -323,7 +323,7 @@ def _project_file(project_dir: Path, file_path: str) -> str:
     """
     base_path = os.path.realpath(str(project_dir))
     fullpath = os.path.realpath(os.path.join(base_path, file_path))
-    if not os.path.normcase(fullpath).startswith(os.path.normcase(os.path.join(base_path, ""))):
+    if not fullpath.startswith(os.path.join(base_path, "")):
         raise HTTPException(status_code=403, detail="path escapes project")
     if not os.path.isfile(fullpath):
         raise HTTPException(status_code=404, detail="media not found")
