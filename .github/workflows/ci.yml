@@ -43,3 +43,7 @@ jobs:
       - name: Canonical Windows development gate
         shell: pwsh
         run: pwsh -NoProfile -File tools/dev_check.ps1
+
+      - name: Fork product regression tests
+        shell: pwsh
+        run: pwsh -NoProfile -File tools/test_fork_regressions.ps1

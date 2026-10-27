@@ -55,6 +55,12 @@ pwsh -NoProfile -File tools\bootstrap_dev.ps1 -All
 pwsh -NoProfile -File tools\test_product.ps1
 ```
 
+本 fork 新增或修改過的產品測試（Windows 編碼、中文字幕、backlot 路徑檢查、音樂來源選擇等）列在 `tools/test_fork_regressions.ps1`，CI 在 gate 之後跑它。修 fork 的產品缺陷時，把新的測試檔加進清單：
+
+```powershell
+pwsh -NoProfile -File tools\test_fork_regressions.ps1
+```
+
 ## Canonical Gate
 
 `tools\dev_check.ps1` 會依序執行：
