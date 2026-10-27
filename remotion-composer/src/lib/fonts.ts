@@ -21,6 +21,22 @@ export interface LocalFont {
   weight?: string;
 }
 
+// CSS format() hints are not file extensions: Chromium skips a source whose
+// hint it does not know, so `format('ttf')` drops the font silently.
+const FORMAT_BY_EXTENSION: Record<string, string> = {
+  ttf: "truetype",
+  otf: "opentype",
+  woff: "woff",
+  woff2: "woff2",
+};
+
+function sourceEntry(url: string): string {
+  const file = url.split(/[?#]/)[0].split("/").pop() ?? "";
+  const dot = file.lastIndexOf(".");
+  const format = dot >= 0 ? FORMAT_BY_EXTENSION[file.slice(dot + 1).toLowerCase()] : undefined;
+  return format ? `url('${url}') format('${format}')` : `url('${url}')`;
+}
+
 export function localFontFaceCss(font: LocalFont): string {
   const format = font.format ?? "truetype";
   const weight = font.weight ?? "400 700";
@@ -29,7 +45,7 @@ export function localFontFaceCss(font: LocalFont): string {
     src = `url('${font.src}') format('${format}')`;
   } else if (Array.isArray(font.src)) {
     src = font.src
-      .map((s) => `url('${s}') format('${s.split(".").pop()}')`)
+      .map(sourceEntry)
       .join(", ");
   } else if (font.url) {
     src = `url('${font.url}') format('${format}')`;
