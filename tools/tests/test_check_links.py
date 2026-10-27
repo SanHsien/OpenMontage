@@ -34,7 +34,7 @@ def test_link_with_exact_case_passes(tmp_path, monkeypatch):
 
 
 def test_maintained_document_with_wrong_case_is_missing(tmp_path, monkeypatch):
-    root = _tree(tmp_path, monkeypatch)
+    _tree(tmp_path, monkeypatch)
     monkeypatch.setattr(check_links, "MAINTAINED_DOCUMENTS", ("docs/decisions.md",))
 
     try:
