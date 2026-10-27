@@ -277,9 +277,17 @@ class MusicSelector(BaseTool):
 
     # ---- Selection ---------------------------------------------------------
 
+    @staticmethod
+    def _ceiling(inputs: dict[str, Any]) -> Optional[int]:
+        """Rank of max_cost_tier, or None for a value that is not a tier."""
+        return _COST_RANK.get(inputs.get("max_cost_tier") or "paid")
+
     def _candidates(self, inputs: dict[str, Any]) -> list[tuple[BaseTool, str, str]]:
         allowed = set(inputs.get("allowed_providers") or [])
-        ceiling = _COST_RANK.get(inputs.get("max_cost_tier", "paid"), 2)
+        ceiling = self._ceiling(inputs)
+        if ceiling is None:
+            # An unrecognised ceiling must not fall open to paid generation.
+            return []
 
         out = []
         for tool, capability, cost_tier in self._all_providers():
@@ -364,6 +372,14 @@ class MusicSelector(BaseTool):
         )
 
     def _acquire(self, inputs: dict[str, Any], start: float) -> ToolResult:
+        if self._ceiling(inputs) is None:
+            return ToolResult(
+                success=False,
+                error=(
+                    f"Unknown max_cost_tier={inputs.get('max_cost_tier')!r}. "
+                    f"Use one of: {', '.join(_COST_RANK)}."
+                ),
+            )
         candidates = [c for c in self._candidates(inputs) if self._is_available(c[0])]
         if not candidates:
             return ToolResult(
