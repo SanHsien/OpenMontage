@@ -8,6 +8,7 @@
 
 from __future__ import annotations
 
+import os
 import re
 import sys
 from pathlib import Path
@@ -38,8 +39,35 @@ MAINTAINED_DOCUMENTS = (
 )
 
 
+def _exists_as_written(path: Path) -> bool:
+    """Like exists(), but case-sensitive inside ROOT.
+
+    GitHub serves paths case-sensitively, while Windows finds
+    ``docs/decisions.md`` for ``docs/DECISIONS.md``; checking with exists()
+    alone passes links that are broken on GitHub.
+    """
+    lexical = Path(os.path.normpath(path))
+    try:
+        parts = lexical.relative_to(ROOT).parts
+    except ValueError:
+        return lexical.exists()
+    current = ROOT
+    for part in parts:
+        try:
+            if part not in os.listdir(current):
+                return False
+        except OSError:
+            return False
+        current = current / part
+    return True
+
+
 def iter_documents() -> list[Path]:
-    missing = [relative for relative in MAINTAINED_DOCUMENTS if not (ROOT / relative).is_file()]
+    missing = [
+        relative
+        for relative in MAINTAINED_DOCUMENTS
+        if not ((ROOT / relative).is_file() and _exists_as_written(ROOT / relative))
+    ]
     if missing:
         raise FileNotFoundError("maintained documents missing: " + ", ".join(missing))
     extra = []
@@ -66,9 +94,9 @@ def _missing_relative(path: Path, target: str) -> str | None:
     file_part = unquote(target.split("#", 1)[0])
     if not file_part:
         return None
-    resolved = (path.parent / file_part).resolve()
-    if resolved.exists():
+    if _exists_as_written(path.parent / file_part):
         return None
+    resolved = (path.parent / file_part).resolve()
     try:
         shown = resolved.relative_to(ROOT)
     except ValueError:
