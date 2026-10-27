@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import shutil
 import subprocess
 import time
@@ -137,6 +138,10 @@ class PiperTTS(BaseTool):
             # garbles CJK and accented narration before it reaches Piper.
             encoding="utf-8",
             errors="replace",
+            # `pip install piper-tts` runs Piper as a Python script that reads
+            # sys.stdin, which a child Python on Windows also decodes with the
+            # ANSI code page. Tell the child to read UTF-8 as well.
+            env={**os.environ, "PYTHONIOENCODING": "utf-8"},
             timeout=300,
         )
 

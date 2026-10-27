@@ -41,6 +41,41 @@ def test_piper_sends_text_to_piper_as_utf8(monkeypatch, tmp_path):
     assert seen["errors"] == "replace"
 
 
+def test_piper_child_process_decodes_narration_as_utf8(monkeypatch, tmp_path):
+    # `pip install piper-tts` puts a Python console script on PATH that reads
+    # narration from sys.stdin. On Windows a child Python decodes a pipe with
+    # the ANSI code page unless told otherwise, so the parent-side encoding
+    # alone still garbles CJK. Run a stand-in that reads stdin the same way.
+    import sys
+
+    from tools.audio import piper_tts
+
+    fake_piper = tmp_path / "fake_piper.py"
+    fake_piper.write_text(
+        "import sys\n"
+        "text = sys.stdin.read()\n"
+        "out = sys.argv[sys.argv.index('--output_file') + 1]\n"
+        "open(out + '.txt', 'w', encoding='utf-8').write(text)\n"
+        "open(out, 'wb').write(b'RIFF')\n",
+        encoding="utf-8",
+    )
+    for name in ("PYTHONUTF8", "PYTHONIOENCODING"):
+        monkeypatch.delenv(name, raising=False)
+
+    real_run = subprocess.run
+
+    def run_stand_in(cmd, **kwargs):
+        return real_run([sys.executable, str(fake_piper), *cmd[1:]], **kwargs)
+
+    monkeypatch.setattr(piper_tts.subprocess, "run", run_stand_in)
+    out = tmp_path / "out.wav"
+    text = "你好，世界 Olá"
+    result = piper_tts.PiperTTS()._generate({"text": text, "output_path": str(out)})
+
+    assert result.success, result.error
+    assert Path(str(out) + ".txt").read_text(encoding="utf-8") == text
+
+
 def test_video_compose_text_subprocess_calls_decode_utf8():
     tree = ast.parse((REPO_ROOT / "tools/video/video_compose.py").read_text(encoding="utf-8"))
     offenders = []
