@@ -19,6 +19,9 @@ $venvPython = Join-Path $repoRoot ".venv\Scripts\python.exe"
 if (-not (Test-Path -LiteralPath $venvPython)) {
     Write-Host "==> Create .venv"
     python -m venv .venv
+    if ($LASTEXITCODE -ne 0) {
+        throw "python -m venv failed with exit code $LASTEXITCODE"
+    }
 }
 
 Write-Host "==> Install maintenance dependencies"
@@ -41,6 +44,9 @@ if ($All) {
 
 Write-Host "==> Canonical Windows gate"
 & pwsh -NoProfile -File (Join-Path $repoRoot "tools\dev_check.ps1")
+if ($LASTEXITCODE -ne 0) {
+    throw "Canonical Windows gate failed with exit code $LASTEXITCODE"
+}
 
 Write-Host ""
 Write-Host "維護環境可用。要使用影片生成與故事板請參考 docs\DEVELOPMENT.md"
