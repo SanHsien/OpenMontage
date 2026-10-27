@@ -224,6 +224,20 @@ class MusicSelector(BaseTool):
         except Exception:
             return False
 
+    def _reachable(self, tool: BaseTool, inputs: dict[str, Any]) -> bool:
+        """Availability for this request.
+
+        music_library's get_status() only looks at the default folder, so a
+        ``library_dir`` override is checked directly: an override with tracks
+        must win over paid generation, and an empty one must not be chosen.
+        """
+        if tool.capability == "music_library" and inputs.get("library_dir"):
+            try:
+                return bool(tool._list_tracks(tool._library_dir(inputs)))
+            except Exception:
+                return False
+        return self._is_available(tool)
+
     def get_status(self) -> ToolStatus:
         for tool, _, _ in self._all_providers():
             if self._is_available(tool):
@@ -299,7 +313,7 @@ class MusicSelector(BaseTool):
         return out
 
     def _pick(self, inputs: dict[str, Any]) -> Optional[tuple[BaseTool, str, str]]:
-        candidates = [c for c in self._candidates(inputs) if self._is_available(c[0])]
+        candidates = [c for c in self._candidates(inputs) if self._reachable(c[0], inputs)]
         if not candidates:
             return None
 
@@ -328,7 +342,7 @@ class MusicSelector(BaseTool):
         for capability, cost_tier in _TIERS:
             available, unavailable = [], []
             for tool in self._tools_for(capability):
-                (available if self._is_available(tool) else unavailable).append(tool.name)
+                (available if self._reachable(tool, inputs) else unavailable).append(tool.name)
             if available and cheapest is None:
                 cheapest = available[0]
             tiers.append(
@@ -380,7 +394,7 @@ class MusicSelector(BaseTool):
                     f"Use one of: {', '.join(_COST_RANK)}."
                 ),
             )
-        candidates = [c for c in self._candidates(inputs) if self._is_available(c[0])]
+        candidates = [c for c in self._candidates(inputs) if self._reachable(c[0], inputs)]
         if not candidates:
             return ToolResult(
                 success=False,
@@ -406,6 +420,12 @@ class MusicSelector(BaseTool):
                 result = tool.execute(self._inputs_for(tool, inputs))
             except Exception as exc:  # a broken provider must not sink the chain
                 last_error = f"{tool.name}: {exc}"
+                continue
+
+            if result.success and capability == "music_library" and not (result.data or {}).get("tracks"):
+                # music_library lists tracks and succeeds on an empty folder;
+                # that is not an acquired track, so keep walking the tiers.
+                last_error = f"{tool.name}: no tracks in {(result.data or {}).get('library_dir')}"
                 continue
 
             if result.success:
