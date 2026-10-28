@@ -477,3 +477,7 @@ Windows 11、Python 3.14.9，在乾淨的 venv（`requirements-dev.txt`）內，
 **實測**：Windows 11、Python 3.14.9，工作樹內新建 `.venv`，`requirements.txt`＋`requirements-dev.txt` 並把這四個釘在現行版。`tools/dev_check.ps1` GREEN（ruff 0.17.3 檢查通過、`tools/tests` 32 passed）；`tools/test_fork_regressions.ps1` GREEN（348 passed、1 skipped）。
 
 **決定**：宣告下限不動（都是上游的相容性下限），四筆 `deferredLatest` 更新為現行版、`reviewed` 2026-10-28、`revisit` 2026-11-28；理由欄沿用。PyPI 再出新版時會再次提醒。
+
+**補充驗證**（接手後）：另一個乾淨 venv（Python 3.14.9），四個套件同樣是現行版，全量產品測試 `python -m pytest --ignore=tests/qa/test_08_end_to_end.py`（收集 2,291 個）exit 0，沒有失敗或錯誤。openai 的四個工具（`tools/audio/openai_tts.py`、`tools/graphics/image_gen.py`、`tools/graphics/openai_image.py`、`tools/video/sora_video.py`）只有 mock 測試覆蓋，沒有實機呼叫。
+
+**workflow 觸發路徑**：`dependency-freshness.yml` 的 push `paths` 原本不含 `.github/dependency-deferrals.json`，續期推上去不會重跑檢查，紅燈要等下個月排程或手動觸發才會消失。已把這個檔案加進 `paths`。

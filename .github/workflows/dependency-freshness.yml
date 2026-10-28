@@ -8,6 +8,7 @@ on:
       - requirements.txt
       - requirements-gpu.txt
       - tools/check_dependency_freshness.py
+      - .github/dependency-deferrals.json
       - .github/dependabot.yml
       - .github/workflows/dependency-freshness.yml
   schedule:
