@@ -445,3 +445,20 @@ Windows 11、Python 3.14.9，在乾淨的 venv（`requirements-dev.txt`）內，
 - `tools/_kling/account.py`：快取鍵用 10 萬次 PBKDF2，每次查用量多花數十毫秒；為了消 CodeQL 警示（R-27），功能正確，不改。
 
 **驗證**：Windows 11、Python 3.14.9、乾淨 venv（`requirements-dev.txt`）。`tools/dev_check.ps1` exit 0（`tools/tests` 32 passed、連結 16 份 0 斷鏈）；`tools/test_fork_regressions.ps1` 348 passed、1 skipped（符號連結）；`remotion-composer` `npm ci --ignore-scripts` 後 `npx tsc --noEmit` exit 0。
+
+## 2026-10-28：Dependabot 不再對 remotion-to-hyperframes 測試語料開安全性更新
+
+**現象**：2026-10-24 Dependabot 三次對 `.agents/skills/remotion-to-hyperframes/assets/test-corpus/tier-3-data-driven/remotion-src` 的 zod 安全性更新失敗（run `40088430924`、`40126278641`、`40141518030`，`update_files` exit 1）。`dependabot.yml` 原本沒有 npm entry，所以這些是預設設定下的安全性更新；語料有三份 `package.json`（tier-1、tier-2、tier-3），都沒有 lockfile。10-26 已把 tier-3 改成 `zod 4.6.7` 並關閉警示 #9（見上方 10-26 條），之後沒有新的失敗，但只要語料的任何依賴再出現公告，同樣會失敗。
+
+**決定**：`.github/dependabot.yml` 新增一個只涵蓋語料的 npm entry：`directories: ["/.agents/skills/remotion-to-hyperframes/assets/test-corpus/*/remotion-src"]`、`open-pull-requests-limit: 0`、`ignore: [{dependency-name: "*"}]`。
+
+- Dependabot 的安全性更新是每個 manifest 目錄各跑一個工作（run 名稱是「npm_and_yarn in /<目錄>」），套用的是指名那個目錄的 entry。所以 entry 要直接指到語料目錄；`directory: "/"` 只看根目錄，而根目錄沒有 `package.json`，碰不到語料，還會多一個找不到檔案的工作（初版就是這樣，審查時退回）。
+- `ignore` 依 GitHub 文件同時套用到版本更新與安全性更新；`open-pull-requests-limit: 0` 關掉版本更新 PR。語料目錄有 `package.json`，不會有找不到檔案的失敗。
+- `remotion-composer` 不在這個 entry 的目錄裡，維持原本的預設安全性更新（例如 PR #4）。
+- 排除只影響 Dependabot 開 PR，**警示仍會列在 Dependabot alerts**。語料的處理方式維持 10-26 的做法：由人在隔離副本實測後修改，不 dismiss。
+
+**理由**：語料是遷移技能的固定測試資料，沒有 lockfile、不在 CI，只供人手動跑基線渲染。Dependabot 對它的自動修補不能產出可驗證的 PR，只會留下失敗紀錄蓋過真的失敗。
+
+**驗證**：設定生效後，語料目錄不應再出現 Dependabot PR。被 `ignore` 擋下的安全性更新可能在 run 或警示上記一筆「all versions ignored」之類的錯誤，這屬預期；若出現的是 `update_files` 之類的執行失敗，代表設定沒套上，記在這裡再改。
+
+**重新評估的觸發條件**：語料加了 lockfile 或被納入 CI（那時應恢復自動修補），或上述驗證失敗。

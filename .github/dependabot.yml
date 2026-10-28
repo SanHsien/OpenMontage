@@ -13,6 +13,23 @@ updates:
       development-dependencies:
         dependency-type: "development"
 
+  # remotion-to-hyperframes 的 test-corpus：三份沒有 lockfile、不在 CI、由人手動跑基線渲染的
+  # 遷移語料。Dependabot 對它的安全性更新一直失敗（2026-10-24 zod 三次），所以這三個目錄
+  # 版本更新與安全性更新都不開 PR（ignore "*" 也套用到安全性更新）；警示仍列在 Dependabot
+  # alerts，改由人處理。remotion-composer 不在這個 entry，維持預設的安全性更新。
+  # 見 docs/DECISIONS.md 2026-10-28。
+  - package-ecosystem: "npm"
+    directories:
+      - "/.agents/skills/remotion-to-hyperframes/assets/test-corpus/*/remotion-src"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Asia/Taipei"
+    open-pull-requests-limit: 0
+    ignore:
+      - dependency-name: "*"
+
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
