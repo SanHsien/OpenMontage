@@ -2,15 +2,15 @@
   "$comment": "每月依賴檢查用：已經看過、但這次不升的決定。deferredLatest 記下當時審視的版本，PyPI 一超過它就自動恢復提醒。",
   "deferrals": {
     "pytest": {
-      "deferredLatest": "9.1.1",
-      "reviewed": "2026-10-09",
-      "revisit": "2026-11-09",
+      "deferredLatest": "9.2.0",
+      "reviewed": "2026-10-28",
+      "revisit": "2026-11-28",
       "reason": "maintainer test suite baseline; keeps minimum compatibility floor across python 3.10-3.14"
     },
     "pytest-asyncio": {
-      "deferredLatest": "1.4.0",
-      "reviewed": "2026-10-09",
-      "revisit": "2026-11-09",
+      "deferredLatest": "1.4.1",
+      "reviewed": "2026-10-28",
+      "revisit": "2026-11-28",
       "reason": "maintainer test suite baseline; keeps minimum compatibility floor across python 3.10-3.14"
     },
     "httpx": {
@@ -20,9 +20,9 @@
       "reason": "maintainer test suite baseline; keeps minimum compatibility floor"
     },
     "ruff": {
-      "deferredLatest": "0.17.2",
-      "reviewed": "2026-10-24",
-      "revisit": "2026-11-24",
+      "deferredLatest": "0.17.3",
+      "reviewed": "2026-10-28",
+      "revisit": "2026-11-28",
       "reason": "maintainer linter baseline; bump tested separately from product changes"
     },
     "pydantic": {
@@ -74,9 +74,9 @@
       "reason": "upstream runtime compatibility floor; tracking calesthio/OpenMontage baseline"
     },
     "openai": {
-      "deferredLatest": "3.37.0",
-      "reviewed": "2026-10-24",
-      "revisit": "2026-11-24",
+      "deferredLatest": "3.40.0",
+      "reviewed": "2026-10-28",
+      "revisit": "2026-11-28",
       "reason": "upstream runtime compatibility floor; tracking calesthio/OpenMontage baseline"
     },
     "fastapi": {

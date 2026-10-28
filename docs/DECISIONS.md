@@ -462,3 +462,18 @@ Windows 11、Python 3.14.9，在乾淨的 venv（`requirements-dev.txt`）內，
 **驗證**：設定生效後，語料目錄不應再出現 Dependabot PR。被 `ignore` 擋下的安全性更新可能在 run 或警示上記一筆「all versions ignored」之類的錯誤，這屬預期；若出現的是 `update_files` 之類的執行失敗，代表設定沒套上，記在這裡再改。
 
 **重新評估的觸發條件**：語料加了 lockfile 或被納入 CI（那時應恢復自動修補），或上述驗證失敗。
+
+## 2026-10-28：四筆依賴延後到期，以新版實測後續延
+
+推送 `dependabot.yml` 觸發的 Dependency freshness（run `40641976720`）報四筆 REVIEW UPDATE：延後時看到的版本之後又出了新版，延後自動失效。
+
+| 套件 | 宣告 | 原延後版本 | 現行版 |
+|---|---|---|---|
+| `pytest` | `>=8.0` | 9.1.1 | 9.2.0 |
+| `pytest-asyncio` | `>=0.23` | 1.4.0 | 1.4.1 |
+| `ruff` | `>=0.9` | 0.17.2 | 0.17.3 |
+| `openai` | `>=2.44.0` | 3.37.0 | 3.40.0 |
+
+**實測**：Windows 11、Python 3.14.9，工作樹內新建 `.venv`，`requirements.txt`＋`requirements-dev.txt` 並把這四個釘在現行版。`tools/dev_check.ps1` GREEN（ruff 0.17.3 檢查通過、`tools/tests` 32 passed）；`tools/test_fork_regressions.ps1` GREEN（348 passed、1 skipped）。
+
+**決定**：宣告下限不動（都是上游的相容性下限），四筆 `deferredLatest` 更新為現行版、`reviewed` 2026-10-28、`revisit` 2026-11-28；理由欄沿用。PyPI 再出新版時會再次提醒。
