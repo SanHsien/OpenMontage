@@ -481,3 +481,51 @@ Windows 11、Python 3.14.9，在乾淨的 venv（`requirements-dev.txt`）內，
 **補充驗證**（接手後）：另一個乾淨 venv（Python 3.14.9），四個套件同樣是現行版，全量產品測試 `python -m pytest --ignore=tests/qa/test_08_end_to_end.py`（收集 2,291 個）exit 0，沒有失敗或錯誤。openai 的四個工具（`tools/audio/openai_tts.py`、`tools/graphics/image_gen.py`、`tools/graphics/openai_image.py`、`tools/video/sora_video.py`）只有 mock 測試覆蓋，沒有實機呼叫。
 
 **workflow 觸發路徑**：`dependency-freshness.yml` 的 push `paths` 原本不含 `.github/dependency-deferrals.json`，續期推上去不會重跑檢查，紅燈要等下個月排程或手動觸發才會消失。已把這個檔案加進 `paths`。
+
+## 2026-10-30：Windows CI 七項回歸測試略過原因確認
+
+**範圍**：只調查略過原因並保存證據，不修改產品、測試或 CI 設定。最近一次 [CI run 40745301061](https://github.com/SanHsien/OpenMontage/actions/runs/40745301061) 對應 `050d55993c8c6c65c7b85aa3f687b13c359bc6c6`（本次工作樹起點），執行於 2026-10-28 UTC／2026-10-29 台北時間。Python 3.10、3.11、3.12、3.13、3.14 的 `Fork product regression tests` 步驟全部成功，皆為 `342 passed, 7 skipped`。
+
+**確認方法**：原 CI 使用 `pytest -q`，沒有 `-rs`，所以沒有原因文字；不能把本機的符號連結略過直接當成 runner 原因。[Python 3.14 job 123017370355](https://github.com/SanHsien/OpenMontage/actions/runs/40745301061/job/123017370355) 的進度字元顯示：349 個測試中，第 276–278、336–337、348–349 個為 `s`，其餘為 `.`。使用相同的 13 檔清單，在本機僅從子行程 PATH 移除含 `ffmpeg.exe`／`ffprobe.exe` 的目錄，保留 Node，再以 `-rs` 和 JUnit XML 核對收集順序，七個位置完全一致：
+
+- 第 276–278 個，`tests/lib/test_source_media_review_video_probe.py`：
+  - `test_video_probe_records_resolution_and_audio`
+  - `test_video_probe_samples_real_frames`
+  - `test_audio_track_marks_clip_usable_as_source_audio`
+  - 原因：`ffmpeg/ffprobe required to build the fixture clip`。檔案層的條件為任一工具不在 PATH，略過建立真實影音素材的三項測試。
+- 第 336–337 個，`tests/tools/test_video_trimmer_concat.py`：
+  - `test_concat_keeps_video_across_timed_segments`
+  - `test_concat_reports_failure_instead_of_a_videoless_file`
+  - 原因：`ffmpeg/ffprobe required to build the fixture clips`。同樣檢查任一工具不在 PATH，略過兩項真實串接測試。
+- 第 348–349 個，`tests/tools/test_windows_cjk_followups.py`：
+  - `test_final_review_flags_a_black_render`
+  - `test_final_review_does_not_flag_a_non_black_render`
+  - 原因：`ffmpeg not installed`。實際條件同時檢查 FFmpeg 與 ffprobe；文字本身不能證明只缺 FFmpeg。
+
+**結論與限制**：CI 的七項略過由影音工具在 PATH 上不可用造成，不是符號連結權限，也不是缺少 Python 套件。這是依原 CI 的略過位置、同版本原始碼條件與受控重現交叉確認；原 runner 已結束，不能再探測它當時究竟少了哪一個執行檔，也不能把「不在 PATH」宣稱成「磁碟未安裝」。Node 字型測試沒有略過，缺少 Python 依賴會造成收集錯誤，不能解釋此次綠燈的七項略過。
+
+**本機差異**：Windows、Python 3.14.10、Node 26.12.1、FFmpeg／ffprobe 9.0.2，專案內乾淨 `.venv` 安裝 `requirements-dev.txt`。本機建立符號連結實際回傳 `WinError 1314`（缺少權限），因此第 9 個 `tests/backlot/test_server.py::TestBacklotServerApi::test_media_rejects_symlink_out_of_project` 另有一項略過，原因為 `creating symlinks needs Developer Mode or admin on Windows`；CI 同一位置是 `.`，已執行通過。移除影音工具的本機完整清單結果為 `341 passed, 8 skipped`（上述七項＋本機權限一項），exit 0；正常 PATH 的結果另見下方驗證。
+
+**重現指令**（僅暫改目前 PowerShell 行程的環境，結束後還原；不需卸載工具或改權限）：
+
+```powershell
+$savedPath = $env:PATH
+$savedPytestOptions = $env:PYTEST_ADDOPTS
+try {
+    $env:PATH = ($env:PATH -split ';' | Where-Object {
+        $_ -and -not ((Test-Path -LiteralPath (Join-Path $_ 'ffmpeg.exe')) -or
+                     (Test-Path -LiteralPath (Join-Path $_ 'ffprobe.exe')))
+    }) -join ';'
+    .venv\Scripts\python.exe -c "import shutil; print({x: shutil.which(x) for x in ('ffmpeg', 'ffprobe', 'node')})"
+    $env:PYTEST_ADDOPTS = '-rs'
+    pwsh -NoProfile -File tools\test_fork_regressions.ps1
+    if ($LASTEXITCODE -ne 0) { throw "Regression exit code: $LASTEXITCODE" }
+} finally {
+    $env:PATH = $savedPath
+    $env:PYTEST_ADDOPTS = $savedPytestOptions
+}
+```
+
+正常情境沿用 `PYTEST_ADDOPTS=-rs` 跑相同腳本，不變更 PATH。此項為調查與文件修正，沒有程式 bug 修正，故不製造先紅後綠的回歸測試；缺依賴造成的收集錯誤也不算回歸紅燈。
+
+**正常環境驗證**：`PYTEST_ADDOPTS=-rs` 下，`pwsh -NoProfile -File tools/test_fork_regressions.ps1` exit 0，結尾 `348 passed, 1 skipped in 117.85s (0:01:57)`、`FORK REGRESSION TESTS GREEN`；七項影音測試全部通過，只略過符號連結測試。`pwsh -NoProfile -File tools/test_product.ps1` exit 0，找到 156 個工具，結尾 `PRODUCT TESTS GREEN`。本次 CI 摘要、位置比對、JUnit XML 與本機輸出保存在忽略目錄 `scratch/ci-skip-audit/`，不列入提交；上述 CI 連結與重現指令可獨立核對結論。

@@ -4,12 +4,10 @@
 > 現況段的數字是 2026-10-29 依 `main` `500484e343d4` 查的快照，開工前先重查 GitHub。
 
 ## 現況
-這是 Windows 原生的 AI 影片製作維護 fork（[AGENTS.md:7](AGENTS.md)、[README.md:62](README.md)）。2026-10-29 `gh` 查詢顯示 CI、CodeQL、Dependency freshness、Upstream check 最近結果成功，Dependabot 與 code scanning 開啟告警皆為 0；issues 停用，未查到 issue，不能當成零筆（2026-10-29 `gh` 查詢）。目前限制是雲端 OpenAI 工具只有 mock 驗證，語料 Dependabot 新設定仍待下一次適用事件驗證（[docs/DECISIONS.md:462](docs/DECISIONS.md)、[docs/DECISIONS.md:481](docs/DECISIONS.md)）。
+這是 Windows 原生的 AI 影片製作維護 fork（[AGENTS.md:7](AGENTS.md)、[README.md:62](README.md)）。2026-10-29 `gh` 查詢顯示 CI、CodeQL、Dependency freshness、Upstream check 最近結果成功，Dependabot 與 code scanning 開啟告警皆為 0；issues 停用，未查到 issue，不能當成零筆（2026-10-29 `gh` 查詢）。目前限制是雲端 OpenAI 工具只有 mock 驗證，語料 Dependabot 新設定仍待下一次適用事件驗證（[docs/DECISIONS.md:462](docs/DECISIONS.md)、[docs/DECISIONS.md:481](docs/DECISIONS.md)）。2026-10-30 已核對最近 CI 的七項略過，皆為 FFmpeg／ffprobe 在 PATH 不可用；本機符號連結權限略過是另一情境，逐項證據見 [docs/DECISIONS.md](docs/DECISIONS.md)。
 
 ## 近期：可以直接動手
-| 項目 | 為什麼 | 驗收方式 | 建議執行者 | 證據 |
-| --- | --- | --- | --- | --- |
-| 釐清 Windows CI 回歸測試的略過原因 | 本機與 runner 略過情境不同，既有報告只有推測 | 讀取最近 `CI` 的 fork regression 步驟；必要時用 pytest 的略過原因輸出重現，逐項確認是否為缺工具或權限，留下可核對的原因 | Codex | 深掃報告（2026-10-27）「驗證」：CI 在 `4ef7496` 為 342 passed／7 skipped，略過原因未列；commit `6875bfd` |
+目前沒有可直接動手的項目。
 
 ## 中期：等條件成立再做
 | 項目 | 觸發條件 | 驗收方式 | 建議執行者 | 證據 |
