@@ -529,3 +529,40 @@ try {
 正常情境沿用 `PYTEST_ADDOPTS=-rs` 跑相同腳本，不變更 PATH。此項為調查與文件修正，沒有程式 bug 修正，故不製造先紅後綠的回歸測試；缺依賴造成的收集錯誤也不算回歸紅燈。
 
 **正常環境驗證**：`PYTEST_ADDOPTS=-rs` 下，`pwsh -NoProfile -File tools/test_fork_regressions.ps1` exit 0，結尾 `348 passed, 1 skipped in 117.85s (0:01:57)`、`FORK REGRESSION TESTS GREEN`；七項影音測試全部通過，只略過符號連結測試。`pwsh -NoProfile -File tools/test_product.ps1` exit 0，找到 156 個工具，結尾 `PRODUCT TESTS GREEN`。本次 CI 摘要、位置比對、JUnit XML 與本機輸出保存在忽略目錄 `scratch/ci-skip-audit/`，不列入提交；上述 CI 連結與重現指令可獨立核對結論。
+
+## 2026-11-02：上游審查（commit `e01dbf4`..`195eab2`、PR #865–#885、Issue #864／#880）
+
+**範圍**：3 個新 commit（`53e34e6`、`454bb28`、`195eab2`）、18 筆 PR（2 筆已關閉未合併、1 筆已合併、15 筆開放）、2 筆 Issue（皆開放）。水位：commit `e01dbf4`→`195eab2`、PR 863→885、Issue 856→880。沒有對上游留言、開 PR 或 push。
+
+**方法**：commit 以 `git diff e01dbf4 upstream/main` 取得後 `git apply -3`（3 檔，乾淨套用）；PR 取每筆**目前**的 head（下表）抓 diff。隱藏內容掃描（`\S\s{40,}\S`、`eval(`／`new Function(`／`globalThis`／`atob(`／`fromCharCode`、base64 長串、零寬與雙向控制字元、控制碼）：15 筆開放／已合併 PR 皆 0 命中，只有 #871 有 2 行超過 400 字元（Markdown 設計文件段落）。
+
+### commit 軸（3 筆，全部採用）
+
+- `53e34e6`（Merge commit from fork，GHSA-cg89-3297-mwhg；`tools/video/showcase_card.py` +138/-47、`tools/video/video_compose.py`、新增 `tests/tools/test_showcase_card_security.py` 283 行）、`454bb28`／`195eab2`（#867，把回歸測試改成斷言真正的 `force_style` 屬性）。缺陷：`title_color` 等值直接串進 FFmpeg filtergraph，可附加第二個 drawtext 讀任意本機檔案；`_build_subtitle_style` 的字幕樣式值同樣未過濾。**本 fork 已有的舊緩解**：套用前 `video_compose.py` 的 `_build_subtitle_style` 完全沒有 `_safe()`（與上游舊版相同），所以沒有衝突，上游新版直接取代。這是安全修正且為上游已合併的 commit，依「產品程式以上游為準」整批取用。驗證：`python -m pytest tests/tools/test_showcase_card_security.py` 24 passed。
+
+### PR／Issue 軸
+
+| 項目 | 狀態／head | 規模 | 結論 | 證據與觸發條件 |
+| --- | --- | --- | --- | --- |
+| PR #867 | merged `454bb286` | +58/-6 1 檔 | 已隨 commit 軸採用 | 見上 |
+| PR #873 | open `8c327560` | +6/-6 2 檔 | **採用(移植做法)** | `tools/avatar/lip_sync.py:197-204` 與 `talking_head.py:201-211` 以 `cwd=wav2lip_dir`／`sadtalker_dir` 執行推論腳本，但 `--face`／`--audio`／`--source_image` 原樣傳入使用者給的相對路徑，子行程在模型目錄找不到檔案。已在入口對 `video_path`／`audio_path`／`image_path`／`output_path` 加 `.resolve()`，與上游 diff 相同（規模只有 6 行，沒有不照抄的部分）；新增 `tests/tools/test_avatar_relative_paths.py`（2 個測試，修前失敗、修後通過）。觸發=上游合併時以上游版本為準 |
+| PR #865＋Issue #864 | open `147fab1b` | +156/-1 2 檔 | 延後 | `math_animate` 的靜態掃描只看 import 根與 dunder，`zipfile.os.system(...)` 可繞過（上游測試 7 項）。`MathAnimate._scan_scene_code` docstring 已寫明掃描「不保證安全」，且 `allow_unsafe_code` 是明確的逃生口，威脅模型是 Agent 自己寫的場景碼。PR 在 `_scan_scene_code` 前多加了一行重複的 `@staticmethod`（diff 內可見），品質待上游收斂。本 fork 沒有對外接受不可信場景碼的入口。觸發=上游合併，或本 fork 開放不可信輸入進 `math_animate`；屆時採上游版本 |
+| PR #872 | open `3c6f6b12` | +27/-2 1 檔 | 延後 | 缺陷存在（`diagram_gen.py:188` 固定傳 `-w`，mermaid-cli 12 起改為 `--size`），只影響已升到 mermaid-cli 12 的環境。本機未安裝 mmdc，無法重現。觸發=上游合併，或本機升級 mermaid-cli 12 |
+| PR #874 | open `750ef2e0` | +8/-0 1 檔 | 本 fork 已處理 | `scripts/backlot_simulate_run.py:97-` 已有 proposal 階段的 `cp("proposal", …)` 與完整 `proposal_packet`（fork 先前加的 80 行）；PR 的版本只是較簡單的同一件事。不採用 |
+| PR #875 | open `0cc6fa1f` | +127/-17 5 檔 | 延後 | torchvision 新版移除 `functional_tensor`，`face_restore`／`upscale` 需補相容層（新增 `_basicsr_compat.py`，fork 沒有這檔，`tools/` 內也無 `functional_tensor` 引用）。需要 GPU 與 basicsr 實機驗證，本機無法重現。觸發=上游合併，或本機實際跑 face_restore |
+| PR #876 | open `4d15bb04` | +257/-27 3 檔 | 延後 | HunyuanVideo 1.5／LTX-2／CogVideoX 的 I2V pipeline 對應（`tools/video/_shared.py:171-209` 目前各只有單一 `pipeline_class`）。需要 diffusers 與大模型權重驗證；本線沒有這些本機模型。觸發=上游合併，或本機啟用這三個模型的 I2V |
+| PR #877 | open `b72e2d6c` | +102/-0 4 檔 | 略過 | 新增 Claude Code plugin 與 `.claude-plugin/marketplace.json`；本 fork 沒有 `.claude-plugin/` 或 `plugins/`（`ls` 皆不存在），是新發佈管道，不是缺陷修正 |
+| PR #878 | open `94117fbe` | +20/-6 3 檔 | 延後 | Remotion 直式短片的字幕版面與尾端留白選項；新功能。觸發=上游合併後比對 |
+| PR #879 | open `fc461b71` | +274/-5 3 檔 | 延後 | 泰文逐字卡拉 OK 字幕斷詞，新增 `requirements.txt` 依賴。非 CJK 專屬；與 #828 的中文處理不同路徑。觸發=上游合併，或本線出現泰文需求 |
+| PR #881 | open `12da36ec` | +102/-6 3 檔 | 延後 | talking-head 技能文件的 `execute()` 範例修正與契約測試；文件小修。觸發=上游合併 |
+| PR #882 | open `b2ee8da3` | +104/-1 2 檔 | 延後 | `VideoCompose.idempotency_key_fields = ["operation", "input_path", "edit_decisions"]`（`video_compose.py:228`）未含其他渲染輸入，快取可能誤命中；缺陷屬實但牽動快取語意，且與 #883 同一類，等上游一起定案。觸發=上游合併，或本機遇到換參數卻拿到舊輸出 |
+| PR #883 | open `90703bd5` | +75/-1 2 檔 | 延後 | 同 #882，對象是 `remotion_caption_burn`（`idempotency_key_fields = ["input_path", "segments", "srt_path"]`，`:147`）。同上 |
+| PR #884 | open `2be2633d` | +166/-3 2 檔 | 延後 | `provider_routing.py` 對自由格式 model 欄位的明確指定；路由行為變更。觸發=上游合併 |
+| PR #871 | open `26bead7a` | +522/-53 20 檔 | 延後 | 雙輸出編輯風格匯出與資料解說風格，含 `ci.yml` 與 `lib/` 變更；新功能且動到 CI，不收。觸發=上游合併後比對 |
+| PR #869 | closed `7973b5c1` | +95/-1 5 檔 | 略過 | Docker／whisperx 文件，上游未收；本線為 Windows 原生維護線（同 #860） |
+| PR #870 | closed `5f13966a` | +455/-91 13 檔 | 略過 | 「checkpoint existing provider and composer work」，非修正投稿，上游未收 |
+| PR #885 | open `4a440fea` | +115/-0 3 檔 | 延後 | 新增於審查途中（`--strict` 重跑才出現）；`comfyui_video` 改用下載後的 ffprobe 結果回報寬高／fps／影格數（對應 Issue #880）。缺陷屬實：`comfyui_video.py:577` 缺輸入時以 WAN 預設 832／640 回報，與自訂 workflow 實際輸出不符；動到共用 `_shared.py` 的 `probe_output`，本機沒有 ComfyUI 可重現。diff 掃描 0 命中。觸發=上游合併，或本機使用自訂 ComfyUI workflow |
+| Issue #864 | open | — | 延後 | 同 PR #865 |
+| Issue #880 | open | — | 延後 | 同 PR #885（`comfyui_video` 對成功渲染的自訂 workflow 回傳預設媒體 metadata） |
+
+**水位**：`tools/upstream_baseline.json` 的 `reviewed_through` `e01dbf4`→`195eab2`（完整 SHA）、`reviewed_pr_through` 863→885、`reviewed_issue_through` 856→880、`reviewed_date` 2026-11-02。
