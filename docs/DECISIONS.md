@@ -1,5 +1,28 @@
 # 維護決策
 
+## 2026-11-05：八筆依賴新版重新審視，保留下限並續延
+
+**範圍**：本機 `check_dependency_freshness.py --strict` 回報八筆 `REVIEW UPDATE`；工作樹起點 `c98eec01bf68f4e1f16be987c40ff86b1d15d5f0`，沒有前次未提交改動。
+
+| 套件 | 宣告下限 | 原延後版本 → 本次 PyPI 版本 | 續延理由 |
+| --- | --- | --- | --- |
+| pydantic | 2.0 | 2.14.1 → 2.14.3 | 保留上游相容下限；新版驗證與 schema 行為尚未完成 Python 3.10–3.14 矩陣驗收 |
+| google-auth | 2.0 | 2.62.0 → 2.62.1 | Google TTS／Vertex AI 服務帳戶驗證缺少具憑證的實測 |
+| google-genai | 1.0.0 | 2.33.0 → 2.34.0 | Lyria／Veo／Gemini Omni 的雲端呼叫尚未完成另行授權的實測 |
+| openai | 2.44.0 | 3.40.0 → 3.46.0 | 保留 Videos API 下限；離線 mock 不足以證明新版 TTS／圖片／影片服務呼叫相容 |
+| websockets | 14.0 | 17.3 → 17.4 | 舊版 17.3 證據不能代替 17.4 的 Eleven v4 Turbo／即時傳輸驗收 |
+| torch | 2.0 | 2.14.1 → 2.15.0 | 尚未驗證 Windows CUDA、GPU 推論與三件組的相容組合 |
+| torchaudio | 2.0 | 2.11.0 → 2.11.1 | 音訊擴充需與 torch／Windows CUDA 成組驗證，不能各取最新版本推論相容 |
+| torchvision | 0.15 | 0.29.1 → 0.29.2 | 尚缺 torch／CUDA 與 basicsr face_restore／upscale 實測；沿用上游 #875 的重評條件 |
+
+**決定**：八筆均採指定版本延後（c），更新 `deferredLatest`、`reviewed: 2026-11-05`、`revisit: 2026-12-05` 與個別理由。不變更 requirements 下限、lock、產品程式或 workflow；續延不是宣稱新版已通過完整產品相容驗收，也不限制安裝器在現有範圍內選新版。
+
+**參考**：[Pydantic 2.14.3](https://github.com/pydantic/pydantic/releases/tag/v2.14.3)、[Gen AI SDK 2.34.0](https://github.com/googleapis/python-genai/releases/tag/v2.34.0)、[OpenAI SDK 3.46.0](https://github.com/openai/openai-python/releases/tag/v3.46.0)、[websockets 相容政策與變更紀錄](https://websockets.readthedocs.io/en/stable/project/changelog.html)、[PyTorch 版本配套](https://docs.pytorch.org/get-started/previous-versions/)。google-auth 的對應 GitHub release 頁回 404，版本以本機 checker 的 PyPI 結果為準；不據此宣稱已讀到該版 release notes。
+
+**重評**：沿用 ROADMAP「重評依賴延後紀錄」；到期、PyPI 超過本次版本或具備所需服務／GPU 驗收條件時重評。遠端 workflow 另檢查開放的 Dependabot PR；本次 `gh pr list --repo SanHsien/OpenMontage --state open --author app/dependabot --json number,title,url` 因無權讀取 GitHub CLI 設定而失敗，不宣稱遠端 workflow 已綠。
+
+**驗證**：工作樹內新建 `.venv`，依 `requirements-dev.txt` 安裝（包含產品 requirements）；實裝 pydantic 2.14.3、google-auth 2.62.1、google-genai 2.34.0、openai 3.46.0、websockets 17.4，未安裝 GPU 三件組。`pip check` exit 0；新鮮度 strict 檢查由 exit 1（八筆 REVIEW UPDATE）轉為 exit 0；`tools/dev_check.ps1` exit 0（32 passed、16 份文件 0 斷鏈）；`tools/test_fork_regressions.ps1` exit 0（341 passed、8 skipped）；`tools/test_product.ps1` exit 0（PRODUCT TESTS GREEN）。首次維護 gate 因共用 pytest 暫存目錄權限失敗（25 passed、7 errors）；首次 fork 回歸也出現暫存錯誤並中止，將子行程 TEMP／TMP 指向工作樹 `scratch/` 後完成重跑。這些是本機離線 gate 證據，不是全量 pytest、Python 矩陣、雲端或 GPU 實測。原始輸出保留於未納管的 `scratch/`。
+
 ## 2026-09-12：建立 Windows-first 維護型 fork
 
 **決定**：fork `calesthio/OpenMontage`，保留 GNU Affero General Public License v3.0 (AGPL-3.0) 與完整歷史。本線預設分支用 `main`。本線聚焦繁中文件、Windows 開發 gate、Windows CI，以及逐筆審查的上游追蹤。

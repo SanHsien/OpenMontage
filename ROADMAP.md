@@ -15,7 +15,7 @@
 | 驗證語料 Dependabot 排除設定 | 語料依賴再次收到安全公告 | 查該目錄的 Dependabot job，確認不再產生 `update_files` 失敗；若設定未生效，修正後重驗且保留 composer 的安全更新 | Codex | [docs/DECISIONS.md:449](docs/DECISIONS.md) |
 | 驗證 OpenAI 工具實際呼叫 | 維護者提供測試帳戶並同意費用 | 用一組最小素材驗證 TTS、圖片與影片所需路徑，核對輸出與成本；離線回歸 gate 通過 | 維護者 | [docs/DECISIONS.md:481](docs/DECISIONS.md) |
 | 重評慢速剪輯與 PyAV 相容修正 | 上游合併相應修正，或本機重現慢速截斷／新版 PyAV 錯誤 | 先用真實慢速片段或轉錄輸入重現，再做最小修正；避免全域替換 PyAV 函式；相關回歸與 Windows gate 通過 | Codex | [docs/DECISIONS.md:410](docs/DECISIONS.md)；上游 #858、#859 |
-| 重評依賴延後紀錄 | `.github/dependency-deferrals.json` 的 revisit 到期或 freshness 提醒新版 | 在乾淨環境測新版；`tools/dev_check.ps1` 與 `tools/test_fork_regressions.ps1` 通過，採用或續延有理由 | Codex | [docs/DECISIONS.md:466](docs/DECISIONS.md) |
+| 重評依賴延後紀錄 | `.github/dependency-deferrals.json` 的 revisit 到期或 freshness 提醒新版 | 在乾淨環境測新版；`tools/dev_check.ps1` 與 `tools/test_fork_regressions.ps1` 通過，採用或續延有理由 | Codex | [docs/DECISIONS.md](docs/DECISIONS.md)（2026-11-05：八筆續延；雲端與 GPU 實測限制見裁決） |
 
 ## 刻意不做
 | 不做什麼 | 理由 | 什麼情況下重新考慮 |

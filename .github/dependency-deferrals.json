@@ -26,10 +26,10 @@
       "reason": "maintainer linter baseline; bump tested separately from product changes"
     },
     "pydantic": {
-      "deferredLatest": "2.14.1",
-      "reviewed": "2026-10-24",
-      "revisit": "2026-11-24",
-      "reason": "upstream runtime compatibility floor; tracking calesthio/OpenMontage baseline"
+      "deferredLatest": "2.14.3",
+      "reviewed": "2026-11-05",
+      "revisit": "2026-12-05",
+      "reason": "Retain upstream >=2.0 compatibility floor; defer raising the baseline until validation/schema behavior is checked across the Python 3.10-3.14 matrix."
     },
     "jsonschema": {
       "deferredLatest": "4.26.0",
@@ -62,22 +62,22 @@
       "reason": "upstream runtime compatibility floor; tracking calesthio/OpenMontage baseline"
     },
     "google-auth": {
-      "deferredLatest": "2.62.0",
-      "reviewed": "2026-10-24",
-      "revisit": "2026-11-24",
-      "reason": "upstream runtime compatibility floor; tracking calesthio/OpenMontage baseline"
+      "deferredLatest": "2.62.1",
+      "reviewed": "2026-11-05",
+      "revisit": "2026-12-05",
+      "reason": "Retain upstream >=2.0 floor; service-account Google TTS and Vertex AI authentication has no credential-backed smoke in this review."
     },
     "google-genai": {
-      "deferredLatest": "2.33.0",
-      "reviewed": "2026-10-24",
-      "revisit": "2026-11-24",
-      "reason": "upstream runtime compatibility floor; tracking calesthio/OpenMontage baseline"
+      "deferredLatest": "2.34.0",
+      "reviewed": "2026-11-05",
+      "revisit": "2026-12-05",
+      "reason": "Retain upstream >=1.0.0 floor; Lyria, Veo and Gemini Omni provider calls need separately authorized live validation before adopting a newer baseline."
     },
     "openai": {
-      "deferredLatest": "3.40.0",
-      "reviewed": "2026-10-28",
-      "revisit": "2026-11-28",
-      "reason": "upstream runtime compatibility floor; tracking calesthio/OpenMontage baseline"
+      "deferredLatest": "3.46.0",
+      "reviewed": "2026-11-05",
+      "revisit": "2026-12-05",
+      "reason": "Retain upstream >=2.44.0 Videos API floor; offline mocks do not validate live TTS, image and video calls with the newer SDK baseline."
     },
     "fastapi": {
       "deferredLatest": "0.162.0",
@@ -98,28 +98,28 @@
       "reason": "upstream runtime compatibility floor; tracking calesthio/OpenMontage baseline"
     },
     "torch": {
-      "deferredLatest": "2.14.1",
-      "reviewed": "2026-10-09",
-      "revisit": "2026-11-09",
-      "reason": "upstream GPU runtime compatibility floor; tracking calesthio/OpenMontage baseline"
+      "deferredLatest": "2.15.0",
+      "reviewed": "2026-11-05",
+      "revisit": "2026-12-05",
+      "reason": "Retain upstream GPU floor; latest PyPI versions alone do not establish a compatible torch/torchaudio/torchvision and Windows CUDA combination; GPU model inference is not validated in this review."
     },
     "torchaudio": {
-      "deferredLatest": "2.11.0",
-      "reviewed": "2026-10-09",
-      "revisit": "2026-11-09",
-      "reason": "upstream GPU runtime compatibility floor; tracking calesthio/OpenMontage baseline"
+      "deferredLatest": "2.11.1",
+      "reviewed": "2026-11-05",
+      "revisit": "2026-12-05",
+      "reason": "Retain upstream GPU floor; audio extension and torch compatibility must be checked as a matched Windows/CUDA set with real inference, not independent latest versions."
     },
     "torchvision": {
-      "deferredLatest": "0.29.1",
-      "reviewed": "2026-10-09",
-      "revisit": "2026-11-09",
-      "reason": "upstream GPU runtime compatibility floor; tracking calesthio/OpenMontage baseline"
+      "deferredLatest": "0.29.2",
+      "reviewed": "2026-11-05",
+      "revisit": "2026-12-05",
+      "reason": "Retain upstream GPU floor; defer adoption until matched torch/Windows CUDA and basicsr face_restore/upscale compatibility are validated; upstream PR #875 remains a documented re-review trigger."
     },
     "websockets": {
-      "deferredLatest": "17.3",
-      "reviewed": "2026-10-24",
-      "revisit": "2026-11-24",
-      "reason": "upstream runtime compatibility floor (Eleven v4 Turbo and realtime audio transports, calesthio/OpenMontage e01dbf4); the realtime transport tests pass on 17.3, so the floor stays at upstream's 14.0"
+      "deferredLatest": "17.4",
+      "reviewed": "2026-11-05",
+      "revisit": "2026-12-05",
+      "reason": "Retain upstream >=14.0 floor; defer baseline adoption until Eleven v4 Turbo and realtime transport behavior is checked on 17.4, beyond the prior 17.3 evidence."
     }
   }
 }
