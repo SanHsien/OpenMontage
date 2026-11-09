@@ -24,17 +24,23 @@ $env:PYTHONIOENCODING = "utf-8"
 
 $tests = @(
     "tests/backlot/test_server.py",
+    "tests/backlot/test_simulate_run.py",
     "tests/contracts/test_comfyui_tools.py",
+    "tests/contracts/test_bar_chart_format_contract.py",
     "tests/contracts/test_hunyuan_cloud_video.py",
     "tests/contracts/test_phase0_contracts.py",
     "tests/contracts/test_remotion_local_fonts.py",
+    "tests/contracts/test_skill_reference_paths.py",
     "tests/lib/test_source_media_review_video_probe.py",
     "tests/tools/test_diagram_gen.py",
     "tests/tools/test_music_selector.py",
     "tests/tools/test_piper_adjacent_launcher.py",
+    "tests/tools/test_scene_detect_threshold.py",
+    "tests/tools/test_video_compose_scene_plan_artifact.py",
     "tests/tools/test_stock_provider_detection.py",
     "tests/tools/test_stock_source_adapters.py",
     "tests/tools/test_video_trimmer_concat.py",
+    "tests/tools/test_video_trimmer_concat_codec.py",
     "tests/tools/test_video_trimmer_workspaces.py",
     "tests/tools/test_windows_cjk_followups.py"
 )

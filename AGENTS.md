@@ -15,7 +15,7 @@
 ## 硬性邊界
 
 - 不提交使用者輸入影片、音訊素材、專有文件、API key、token、私鑰或 `.env`。
-- 測試檔案一律不可提交。
+- 臨時重現腳本、測試產出與素材（暫存輸出、`pytest-of-*`、重現用影音）不提交；回歸測試與契約測試放 `tests/`、`tools/tests/` 照常提交。
 - 不推送到 `upstream`。上游同步先跑 `python tools/check_upstream_updates.py`，逐筆審查後再 merge / cherry-pick；不盲目覆蓋 fork 文件與 Windows gate。
 - PR、push、release 一律指向 `SanHsien/OpenMontage`，嚴禁未經當次許可打向 `calesthio/OpenMontage`。
 - 不要把維護 gate 改成完整產品依賴安裝。維護環境（`requirements-dev.txt`）僅安裝 pytest、ruff 與必要依賴。

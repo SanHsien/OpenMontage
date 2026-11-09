@@ -611,7 +611,7 @@ try {
 | `tools/graphics/diagram_gen.py`（#786） | 取上游 | `idempotency_key_fields` 與 `cache_key()` 較完整；fork 原有的 `idempotency_key()` 覆寫保留 |
 | `tools/subtitle/subtitle_gen.py`（#718、#721） | 合併 | 上游的 `escape()` 與 fork 的 `_join_tokens()` 同時使用 |
 | `tools/video/hyperframes_compose.py`（#844） | 取上游 | 離線快取優先；404 與暫時性錯誤分開回報 |
-| `tools/video/video_trimmer.py`（#554） | concat 保留 fork，其餘取上游 | fork 的 concat 已把 `-ss`／`-to` 放在 `-i` 前並檢查輸出有影像串流；取上游 `_cut` 的 `-ss`／`-t` 加 `-avoid_negative_ts`，以及 `codec: auto` |
+| `tools/video/video_trimmer.py`（#554） | concat 保留 fork，其餘取上游 | fork 的 concat 已把 `-ss`／`-to` 放在 `-i` 前並檢查輸出有影像串流；取上游 `_cut` 的 `-ss`／`-t` 加 `-avoid_negative_ts`，以及 `codec: auto`。複查發現 schema 預設 `auto` 只有 `_cut` 懂，concat 會產生 `-c:v auto` 讓 ffmpeg 失敗；`_concat` 把 `auto` 視為 `copy`（concat demuxer 要求各段編碼參數一致，且與先前預設相同），新增 `tests/tools/test_video_trimmer_concat_codec.py`，修前 1 failed、修後 2 passed |
 
 **其他調整**（皆已登記 `FORK.md`）：
 
@@ -654,6 +654,11 @@ try {
 | Issue #887 | open | — | 延後 | CogVideoX 在 Apple Silicon 的 MPS 張量型別錯誤；本機是 Windows，無法重現。觸發=上游合併修正，或本機使用 Apple Silicon |
 | Issue #917 | open | — | 略過 | 要求新增 Google AI Pro 方案支援，不是缺陷 |
 
+### 後續修正
+
+- `AGENTS.md` 的「測試檔案一律不可提交」與同檔的測試目錄說明及長期做法（`tests/`、`tools/tests/` 皆提交）矛盾，改寫為只排除臨時重現腳本、測試產出與素材。
+- `tools/test_fork_regressions.ps1` 補入本次新增或改寫的回歸測試。
+
 ### 驗證
 
 Windows 11、Python 3.14.10，在專案 `.venv`（補裝 `pythainlp` 5.4.0 與 `certifi`）內執行，BelowNormal 優先權。
@@ -672,4 +677,4 @@ Windows 11、Python 3.14.10，在專案 `.venv`（補裝 `pythainlp` 5.4.0 與 `
 
 ### 水位
 
-`tools/upstream_baseline.json`：`reviewed_through` `195eab2`→`fecb9a1e3cc23ef84de30b272059457a427f16f8`、`reviewed_pr_through` 885→924、`reviewed_issue_through` 880→917、`reviewed_date` 2026-11-10。Baseline 代表已審查，不代表已合併。
+`tools/upstream_baseline.json`：`reviewed_through` `195eab2`→`fecb9a1e3cc23ef84de30b272059457a427f16f8`、`reviewed_pr_through` 885→925、`reviewed_issue_through` 880→917、`reviewed_date` 2026-11-10。Baseline 代表已審查，不代表已合併。

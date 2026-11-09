@@ -229,6 +229,10 @@ class VideoTrimmer(BaseTool):
 
         output_path = Path(inputs.get("output_path", "concat_output.mp4"))
         codec = inputs.get("codec", "copy")
+        # The schema default is "auto" (decided per cut in _cut). Concat segments must
+        # share codec parameters for the demuxer, so auto means stream copy here.
+        if codec == "auto":
+            codec = "copy"
 
         # First, cut each segment to a temp file if start/end are specified
         temp_files: list[Path] = []
