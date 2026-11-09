@@ -72,7 +72,15 @@ class VideoTrimmer(BaseTool):
                     },
                 },
             },
-            "codec": {"type": "string", "default": "copy"},
+            "codec": {
+                "type": "string",
+                "default": "auto",
+                "description": (
+                    "auto: stream copy when cutting from 0, otherwise libx264 so the "
+                    "in/out points are frame-accurate. Pass copy explicitly to force the "
+                    "fast path — it snaps the cut to the nearest keyframe."
+                ),
+            },
         },
     }
 
@@ -114,20 +122,32 @@ class VideoTrimmer(BaseTool):
 
         start_s = inputs.get("start_seconds", 0)
         end_s = inputs.get("end_seconds")
-        codec = inputs.get("codec", "copy")
+        codec = inputs.get("codec", "auto")
         output_path = Path(
             inputs.get("output_path", str(input_path.with_stem(f"{input_path.stem}_cut")))
         )
 
-        cmd = [
-            "ffmpeg", "-y",
-            "-i", str(input_path),
-            "-ss", str(start_s),
-        ]
+        # Stream copy can only start on a keyframe, so a cut that starts partway
+        # into the source snaps to the nearest one and returns the wrong range.
+        # Cutting from zero has no such problem, so copy stays the fast path there.
+        if codec == "auto":
+            codec = "copy" if float(start_s) == 0 else "libx264"
+
+        # -ss must precede -i: as an output option it makes ffmpeg keep the
+        # source timestamps, so the clip's frames start at their original PTS
+        # instead of zero. Subtitles and overlays timed from 0 then land
+        # outside the clip's timeline and never render.
+        cmd = ["ffmpeg", "-y", "-ss", str(start_s), "-i", str(input_path)]
+        # -t (duration) rather than -to: with an input-side -ss the output
+        # timeline restarts at zero, so -to would be measured from the seek
+        # point and cut the wrong length.
         if end_s is not None:
-            cmd.extend(["-to", str(end_s)])
+            cmd.extend(["-t", str(max(0, float(end_s) - float(start_s)))])
         if codec == "copy":
-            cmd.extend(["-c", "copy"])
+            # Stream copy can only start on a keyframe, so the cut snaps to the
+            # nearest one at or before start_seconds. make_zero rebases the
+            # timestamps so the clip still starts at 0.
+            cmd.extend(["-c", "copy", "-avoid_negative_ts", "make_zero"])
         else:
             cmd.extend(["-c:v", codec, "-c:a", "aac"])
         cmd.append(str(output_path))

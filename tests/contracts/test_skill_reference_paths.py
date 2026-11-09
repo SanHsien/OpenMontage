@@ -1,0 +1,34 @@
+"""Fail when a skill or doc cites a repo path that does not exist (#799)."""
+
+from pathlib import Path
+import re
+
+import pytest
+
+ROOT = Path(__file__).resolve().parents[2]
+CITE = re.compile(
+    r"`((?:docs|tools|lib|scripts|schemas|skills|styles|pipeline_defs|remotion-composer|backlot)/[^`\s]+)`"
+)
+# Placeholders, globs, and `module.function()` call notation are not paths.
+SKIP = ("<", ">", "*", "$", "{", "(")
+
+
+# Fork docs cite `path:line`, `path:start-end` or `path:line,line`; the suffix is not part of the path.
+LINE_SUFFIX = re.compile(r":\d+(?:[-,]\d*)*$")
+
+
+def _citations():
+    files = [*ROOT.glob("skills/**/*.md"), *ROOT.glob("docs/**/*.md")]
+    for path in sorted(files):
+        for target in CITE.findall(path.read_text(encoding="utf-8")):
+            if not any(marker in target for marker in SKIP):
+                yield path.relative_to(ROOT).as_posix(), LINE_SUFFIX.sub("", target)
+
+
+CASES = list(_citations())
+assert CASES, "no citations found — did the regex drift?"
+
+
+@pytest.mark.parametrize(("source", "target"), CASES, ids=[f"{s}:{t}" for s, t in CASES])
+def test_cited_path_exists(source, target):
+    assert (ROOT / target).exists(), f"{source} cites missing {target}"

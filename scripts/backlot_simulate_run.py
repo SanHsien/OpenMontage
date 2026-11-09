@@ -87,9 +87,10 @@ def main() -> int:
         print(f"[sim] checkpoint {stage} -> {status}")
         time.sleep(wait)
 
-    # research auto-proceeds (schema-valid fixture from the contract tests)
-    cp("research", "in_progress", {})
+    # Research and proposal use schema-valid fixtures from the contract tests.
     from tests.contracts.test_phase0_contracts import sample_artifact
+
+    cp("research", "in_progress", {})
     brief = sample_artifact("research_brief")
     brief["topic"] = "The Last Lighthouse"
     cp("research", "completed", {"research_brief": brief})
@@ -172,6 +173,9 @@ def main() -> int:
                "suggestions": 0, "nitpicks": 0,
                "summary": "Logline holds; direction approved."})
     time.sleep(wait)
+    # A completed proposal checkpoint must carry an approved proposal_packet.
+    proposal["approval"]["status"] = "approved"
+    save_artifact("proposal_packet", proposal)
     cp("proposal", "completed", {"proposal_packet": proposal}, human_approved=True)
 
     # script gates: awaiting_human -> approved
