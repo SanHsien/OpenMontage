@@ -75,7 +75,7 @@
    - 引進 PR #640（`diagram_gen` 精確回報 Mermaid CLI 可用性並在 Preflight 拋出警示）。
    - 引進 PR #641（`source_media_review` 徹底修復影片技術探針被音訊覆蓋、抽樣缺少 `strategy` 及 key 錯誤之嚴重缺陷）。
    - 引進 PR #642（`video_trimmer` concat 模式改用輸入 seek、支援 `codec` 轉碼、修正 `list_path` 潛在 `UnboundLocalError`、增加解碼幀檢驗防範產生 videoless 純音訊檔案）。
-   - 引進 PR #649（Remotion 增加 `lib/fonts.ts` 支援 CJK / 繁中與非拉丁字型動態注入；修復 `backlot_simulate_run.py` 遺漏 proposal 階段門禁前置檢查例外）。
+   - 引進 PR #649（Remotion 增加 `remotion-composer/src/lib/fonts.ts` 支援 CJK / 繁中與非拉丁字型動態注入；修復 `backlot_simulate_run.py` 遺漏 proposal 階段門禁前置檢查例外）。
    - 引進 PR #650（Remotion `CaptionOverlay` 單字間距保留與深色主題 `KPIGrid`、`ComparisonCard` 樣式對比度修復）。
 3. **Windows 11 原生缺陷修復**：
    - 修復 `tools/video/hunyuan_video.py` 遺漏 `from typing import Any`（F821 未定義變數）。
@@ -589,3 +589,86 @@ try {
 | Issue #880 | open | — | 延後 | 同 PR #885（`comfyui_video` 對成功渲染的自訂 workflow 回傳預設媒體 metadata） |
 
 **水位**：`tools/upstream_baseline.json` 的 `reviewed_through` `e01dbf4`→`195eab2`（完整 SHA）、`reviewed_pr_through` 863→885、`reviewed_issue_through` 856→880、`reviewed_date` 2026-11-02。
+
+## 2026-11-10：上游審查（commit `195eab2`..`fecb9a1`、PR #886–#924、Issue #886–#917）
+
+**範圍**：上游 `main` 自 `195eab2` 前進到 `fecb9a1e3cc23ef84de30b272059457a427f16f8`；`--strict` 列出 224 個 commit（第一親代鏈 70 筆：67 筆 PR 合併、3 筆直接提交 `d21f5d4`、`63d1087`〔#897〕、`fecb9a1`〔#905〕）、31 筆 PR（#889–#922，審查途中 `--strict` 重跑又多出 #923、#924，一併處理，共 33 筆）、4 筆 Issue（#886–#888、#917）。224 筆中日期早到 2026-08-26 的是 PR 分支上的原始提交，上游 2026-11-07 起才合併進 `main`，所以排在 baseline 之後。相對 `195eab2` 共 218 檔 +17,484／-634。水位：commit `195eab2`→`fecb9a1`、PR 885→924、Issue 880→917。沒有對上游留言、開 PR 或 push。
+
+**方法**：fork 與上游沒有共同祖先，所以先 `git fetch upstream main`，再 `git diff 195eab2 upstream/main` 取得整段差異，以 `git apply -3 --index` 套用；13 檔衝突，逐檔手解（下表），其餘乾淨套用。未合併 PR 取每筆**目前**的 head，用 `gh pr diff`（唯讀）抓 diff。隱藏內容掃描（`\S\s{40,}\S`、`eval(`／`new Function(`／`globalThis`／`atob(`／`fromCharCode`、120 字元以上 base64 長串、零寬與雙向控制字元、控制碼、`curl|bash`／`iwr|iex`／`bypass`／`dangerously`／`skip-permissions`、超過 400 字元的新增行）：整段合併差異與 22 筆未合併 PR 的 diff 都沒有零寬、雙向控制、控制碼、base64 命中，`eval`／`atob` 等 0 命中。需要人看的命中有兩處：`tools/minicut_cli.py` 的安裝提示字串含 `curl -fsSL https://minicut.ai/install.sh | bash`（只是錯誤訊息，程式不會執行它；處理見下），以及 Markdown 與 JSON 的長段落（`tools/provider_contracts/pika_h3_flex.json`、技能文件、README 翻譯）。
+
+### commit 軸：整批採用，13 檔衝突的處理
+
+| 檔案（來源 PR） | 處理 | 理由 |
+| --- | --- | --- |
+| `README.md`（#908、`d21f5d4`） | 保留 fork | fork 的繁中主檔是自寫的；上游新增的語言切換列與「早期使用者」公告改併入 `README.en.md`（鏡像），`README_pt-BR.md`、`README_es.md`、`README_zh-CN.md` 的英文連結改指 `README.en.md` |
+| `.gitignore`（#875） | 兩邊都留 | fork 的報告檔忽略規則，加上游的 `.npm-cache/`、`pytest-of-*/`、`gfpgan/` |
+| `remotion-composer/src/Explainer.tsx`（#585、#895） | 兩邊都留 | fork 的 `fontFamily` 與上游的 `{...props.captionProps}` |
+| `remotion-composer/src/components/TextCard.tsx`（#780） | 兩邊都留 | fork 的 `fontFamily`（CJK 字型），加上游的 `whiteSpace: "pre-line"` |
+| `remotion-composer/src/components/charts/BarChart.tsx`（#656） | 保留 fork | fork 在 2026-09-13 以 `decimals` 屬性修了同一個問題（Issue #654），標籤與軸刻度都用它；上游另寫 `formatValue`，合併帶進來但不再被引用，已刪除。上游測試 `tests/contracts/test_bar_chart_format_contract.py` 釘的是 `formatValue` 這個實作，改成斷言同一性質（標籤不套用一位小數的格式），已登記 `FORK.md` |
+| `scripts/backlot_simulate_run.py`（#749） | 保留 fork 並補一步 | fork 版本有完整 proposal 階段；上游新增的契約要求完成的 proposal 檢查點必須帶 `approval.status` 為 approved 的封包，fork 版本原本留在 pending，上游新測試 `tests/backlot/test_simulate_run.py` 修前失敗（`CheckpointValidationError`），補上「核准後存檔再完成」，修後通過 |
+| `tests/tools/test_stock_source_adapters.py`、`tools/video/stock_sources/pond5_pd.py`（#597） | 保留 fork | fork 的 Pond5 空白金鑰視為未設定，及其 2 個測試 |
+| `tools/audio/piper_tts.py`（#889） | 保留 fork | fork 版本已包含上游的 UTF-8 編碼，並多傳 `PYTHONIOENCODING` 給子行程 |
+| `tools/graphics/diagram_gen.py`（#786） | 取上游 | `idempotency_key_fields` 與 `cache_key()` 較完整；fork 原有的 `idempotency_key()` 覆寫保留 |
+| `tools/subtitle/subtitle_gen.py`（#718、#721） | 合併 | 上游的 `escape()` 與 fork 的 `_join_tokens()` 同時使用 |
+| `tools/video/hyperframes_compose.py`（#844） | 取上游 | 離線快取優先；404 與暫時性錯誤分開回報 |
+| `tools/video/video_trimmer.py`（#554） | concat 保留 fork，其餘取上游 | fork 的 concat 已把 `-ss`／`-to` 放在 `-i` 前並檢查輸出有影像串流；取上游 `_cut` 的 `-ss`／`-t` 加 `-avoid_negative_ts`，以及 `codec: auto` |
+
+**其他調整**（皆已登記 `FORK.md`）：
+
+- `tools/minicut_cli.py`（#900）：`INSTALL_INSTRUCTIONS` 不採用 `curl … | bash`，改為請維護者自行下載、讀過再執行。MiniCut 工具（#900–#903）本身照上游採用；程式只呼叫已安裝的 `minicut` 命令，不會自行安裝。
+- `tests/contracts/test_skill_reference_paths.py`（#809）：本 fork 的 `docs/DECISIONS.md` 用 `path:line`、`path:起-訖`、`path:行,行` 引用程式位置，測試先去掉這些後綴再檢查路徑；另把本檔 2026-09-13 條目的 「lib/fonts.ts」 改成完整路徑 `remotion-composer/src/lib/fonts.ts`。
+- 新依賴：`requirements.txt` 新增 `pythainlp>=5.0`（泰文字幕斷詞，#895）與 `certifi>=2026.10.19`。`.github/dependency-deferrals.json` 各加一筆（`certifi` 2026.10.23、`pythainlp` 5.4.0，2026-12-10 回頭看）；`ruff`、`google-genai`、`openai`、`fastapi` 的 REVIEW UPDATE 在本次審查之前就存在，不屬於本次範圍。
+- `remotion-composer/package.json` 新增 `engines.node`（`^22.23.4 || ^24.22.1 || ^26.12.1`）；`.node-version` 為 22.23.4。本機 Node 為 26.12.1，符合。
+- 新檔：`.claude/commands/reel.md`（#673，只是把請求導向本 repo 的技能流程，沒有外部指令）、`README_pt-BR.md`、`README_es.md`。
+
+### PR／Issue 軸
+
+已合併的 PR（#889、#895、#897、#898、#900–#903、#905、#906、#908）隨 commit 軸採用，不另列。
+
+| 項目 | 狀態／head | 規模 | 結論 | 證據與觸發條件 |
+| --- | --- | --- | --- | --- |
+| PR #894＋Issue #888 | open `c0f4ee87` | +181/-5 4 檔 | **採用(移植做法)** | Windows 用 `.venv\Scripts\python.exe` 直接執行、沒有啟用 venv 時，`shutil.which("piper")` 找不到裝在同一個 `Scripts` 的 `piper.exe`，狀態被誤報為不可用。`tools/audio/piper_tts.py` 新增 `_resolve_executable()`（PATH 優先，其次直譯器同目錄，Windows 另補 `.exe`，目錄不算執行檔），`get_status()` 與 `_generate()` 共用；沒找到時 `_generate()` 仍用裸名 `piper`，維持原本的失敗方式（上游版本改成提前回錯，會讓既有測試跟著改）。新增 `tests/tools/test_piper_adjacent_launcher.py` 4 個測試，修前 2 個失敗、修後通過。README 段落不收（fork 的 `README.md` 沒有安裝章節）。觸發=上游合併後比對 |
+| PR #915 | open `68ab36c2` | +46/-3 2 檔 | **採用(同上游 diff)** | `tools/analysis/scene_detect.py` 以 `threshold or 27.0` 取預設，明確傳入 `0` 會被當成沒傳。diff 與上游相同；新增的 `tests/tools/test_scene_detect_threshold.py` 修前 3 個失敗、修後通過 |
+| PR #913 | open `cd7f4e65` | +8/-5 4 檔 | **採用(同上游 diff)，測試加調整** | `skills/core/remotion.md`、`skills/creative/bg-remove-usage.md`、`skills/creative/lip-sync-usage.md` 引用的路徑不存在（「skills/styles/」、「tools/bg_remove.py」、「tools/lip_sync.py」），改成實際路徑；同 PR 擴大 `tests/contracts/test_skill_reference_paths.py` 的檢查範圍，套上測試後 12 個失敗，其中 9 個是本 fork `docs/DECISIONS.md` 的 `path:line` 引用被誤判（`path:行,行` 的寫法到第二次全量才發現），見上方調整 |
+| PR #923 | open `b1abd981` | +115/-1 2 檔 | **採用(同上游 diff)** | 渲染前的 slideshow 閘門只認場景清單；傳入 `scene_plan` 產出物（`{"version", "scenes"}`）時被當成鍵的迭代，評分丟例外被吞成警告，檢查等於沒執行。`tools/video/video_compose.py` 的 `_pre_compose_validation()` 改為先取出 `scenes`，並在輸入 schema 宣告 `scene_plan`。diff 與上游相同；新增的 `tests/tools/test_video_compose_scene_plan_artifact.py` 修前 6 個失敗、1 個通過，修後 7 個全過 |
+| PR #924 | open `60ab427e` | +93/-7 5 檔 | 延後 | `StatCard`、`HeroTitle` 的字型改吃主題標題字型；`TextCard` 的 `fontFamily` 屬性 fork 已有（`remotion-composer/src/components/TextCard.tsx`），diff 在 `Explainer.tsx` 與 `TextCard.tsx` 上無法直接套用。觸發=上游合併，或本機影片的數字卡／標題卡字型與主題不一致 |
+| PR #909 | open `f37ec8e4` | +65/-10 2 檔 | 無需動作 | 上游 #703 已合併，`tools/analysis/frame_sampler.py` 已用暫存目錄只回報本次的影格；PR 的 4 個測試在合併後的樹上直接通過（`4 passed`） |
+| PR #891 | open `3ed54e09` | +418/-1 4 檔 | 延後 | 在工具執行時強制預算閘門（新 「tools/cost_gate.py」，改 `tools/tool_registry.py`，與合併後的 `tool_registry.py` 衝突）。行為變更且動到所有工具的執行路徑；本線沒有設預算上限的使用情境。觸發=上游合併，或本機啟用預算上限 |
+| PR #899 | open `9e4b67ce` | +786/-1 6 檔 | 延後 | Kling 4 經 MiniCut CLI 的新 provider，建立在 #900 之上，`docs/PROVIDERS.md` 衝突。本機沒有安裝 `minicut`，無法實跑。觸發=上游合併，或本機啟用 MiniCut |
+| PR #912 | open `a11d66a5` | +111/-2 3 檔 | 延後 | 缺陷屬實：`tools/graphics/code_snippet.py:99`、`:103` 宣告了 `border_radius`、`width`，執行時沒有使用。修法會改變輸出圖片尺寸與透明度。觸發=上游合併，或本線出現需要這兩個參數的卡片 |
+| PR #918 | open `894bdb87` | +161/-14 2 檔 | 延後 | 缺陷看來屬實：`tools/video/video_compose.py:447-448` 的 `-af apad` 搭配 `-shortest` 與 `-c:v copy`。上游描述 ffmpeg 會停在 100% CPU；本機未重現（沒有觸發的素材），不在沒有證據時改動混音路徑。觸發=上游合併，或本機遇到混音卡住 |
+| PR #919 | open `edc82bdb` | +35/-1 2 檔 | 延後 | `tools/audio/audio_mixer.py:675` 的 `apad=whole_dur=`；上游說 `target_duration` 會隨機截斷，同 #918 屬混音路徑，未重現。觸發=上游合併，或遇到截斷 |
+| PR #920 | open `338f9fa8` | +113/-1 8 檔 | 延後 | `edit_decisions` 新增每段 `tone`／`filter` 欄位（改 schema 與 `CinematicRenderer.tsx`）；新功能。觸發=上游合併 |
+| PR #921 | open `16607bd4` | +109/-15 3 檔 | 延後 | `remotion-composer/src/components/charts/KPIGrid.tsx:278` 以 `Math.round` 計數，小數 KPI 顯示成整數；缺陷屬實，新增 `format.ts`。與 #922 同一類圖表格式化。觸發=上游合併，或本機影片出現小數 KPI |
+| PR #922 | open `57c4dc99` | +112/-7 3 檔 | 延後 | `remotion-composer/src/components/charts/LineChart.tsx:88` 的 x 軸刻度用 `formatNumber`，年份會印成 `2.0K`；與合併後的樹有衝突（`git apply --check` 失敗於 `LineChart.tsx:178`）。觸發=上游合併，或本機折線圖用年份當 x 軸 |
+| PR #896 | open `d9cc159a` | +98/-2 2 檔 | 略過 | `Makefile` 把選定環境的 `bin` 放上 `PATH`；本線在 Windows 用 PowerShell 腳本，Piper 的同一問題由 #894 的移植處理 |
+| PR #911 | open `6cc23b99` | +53/-52 12 檔 | 略過 | 上游組織搬遷後的連結與 `ci.yml` 改寫，會蓋掉 fork 的 CI 與 README；與本線無關 |
+| PR #914 | open `c940612b` | +12/-0 1 檔 | 略過 | `.claude/launch.json` 加入作者個人專案的預覽伺服器 |
+| PR #916 | open `fc4ebfe4` | +3/-3 1 檔 | 略過 | `remotion-composer/package-lock.json` 只是搬動 `engines` 欄位的位置，沒有行為差異 |
+| PR #890 | closed `a4151a1c` | +1230/-0 35 檔 | 略過 | 個人宣傳片素材（含 mp4）、`.github/workflows/media-job.yml` 與 「scripts/run_job.py」；非修正，上游未收 |
+| PR #893 | closed `3d5d6988` | +26/-5 3 檔 | 略過 | 讓 Backlot 綁定位址與信任主機清單可由環境變數放寬；會削弱 DNS rebinding 防護，上游未收 |
+| PR #907 | closed `dcaacab9` | +5844/-7 35 檔 | 略過 | 新的 relay provider 層與設定檔；非修正，上游未收 |
+| PR #910 | closed `2cba40f3` | +14458/-625 211 檔 | 略過 | 「CI 驗證用的批次整合」，內容就是上述已合併 PR 的集合，上游未收 |
+| Issue #886 | closed | — | 無需動作 | 已由 #897 合併修正 |
+| Issue #887 | open | — | 延後 | CogVideoX 在 Apple Silicon 的 MPS 張量型別錯誤；本機是 Windows，無法重現。觸發=上游合併修正，或本機使用 Apple Silicon |
+| Issue #917 | open | — | 略過 | 要求新增 Google AI Pro 方案支援，不是缺陷 |
+
+### 驗證
+
+Windows 11、Python 3.14.10，在專案 `.venv`（補裝 `pythainlp` 5.4.0 與 `certifi`）內執行，BelowNormal 優先權。
+
+| 指令 | 結果 |
+| --- | --- |
+| `python -m pytest -q --ignore=tests/qa/test_08_end_to_end.py`（衝突解完後第一次） | 4 failed、2975 passed、19 skipped：模擬執行（上游新增的核准契約）、`BarChart` 釘實作的契約測試、泰文斷詞 2 項（venv 缺 `pythainlp`）；前兩項依上表處理，後兩項補裝依賴後通過 |
+| 同上（移植與調整後第二次） | 1 failed、3346 passed、19 skipped：失敗的是引用路徑測試遇到 `path:行,行` 後綴，已修正並單獨重跑 |
+| 同上（含 #923 移植與本節文字，第三次） | 6 failed、3388 passed、19 skipped：6 個失敗都是本節文字把不存在的路徑（舊路徑、上游新增檔）放在反引號內被引用路徑測試擋下，改用「」標示後 `python -m pytest -q tests/contracts/test_skill_reference_paths.py` 為 404 passed |
+| `python -m pytest -q tests/tools/test_video_compose_scene_plan_artifact.py tests/tools/test_scene_detect_threshold.py tests/tools/test_piper_adjacent_launcher.py` | 先紅後綠：#923 修前 6 failed／1 passed、修後 7 passed；#915 修前 3 failed、修後通過；#894 修前 2 failed／2 passed、修後 4 passed |
+| `remotion-composer`：`npm ci --ignore-scripts` | `found 0 vulnerabilities` |
+| `remotion-composer`：`npx tsc --noEmit` | exit 0 |
+| `remotion-composer`：`npx remotion bundle src/index.tsx` | exit 0 |
+
+**排除與未驗證**：`tests/qa/test_08_end_to_end.py` 排除原因同 2026-10-24（Windows 清理暫存檔 `PermissionError`）。需要付費金鑰、`minicut` 命令、GPU 或 Apple Silicon 的 provider 只由 mock 測試覆蓋，沒有實機呼叫。
+
+### 水位
+
+`tools/upstream_baseline.json`：`reviewed_through` `195eab2`→`fecb9a1e3cc23ef84de30b272059457a427f16f8`、`reviewed_pr_through` 885→924、`reviewed_issue_through` 880→917、`reviewed_date` 2026-11-10。Baseline 代表已審查，不代表已合併。

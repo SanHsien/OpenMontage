@@ -34,6 +34,13 @@
 | `docs/DECISIONS.md`、`docs/UPSTREAM.md`、`docs/DEVELOPMENT.md` | fork 維護文件 |
 | `REVIEW.md` | 全庫風險快照 |
 | `tests/contracts/test_phase0_contracts.py` | 平台指令檔清單移除 `CLAUDE.md`（本 fork 只維護 `AGENTS.md`） |
+| `README_pt-BR.md` / `README_es.md` / `README_zh-CN.md` | 上游語言版本；語言切換列與內文的「英文版」連結改指 `README.en.md`（上游指 `README.md`，在本 fork 是繁中主檔），並在切換列加入繁中 `README.md` |
+| `README.en.md` | 上游 `README.md` 的鏡像；語言切換列、Node 版本與 pip／certifi 升級說明、早期使用者公告同步自上游（2026-11-10） |
+| `tools/minicut_cli.py` | `INSTALL_INSTRUCTIONS` 不採用上游的 `curl … \| bash` 安裝指令，改為請維護者自行下載、讀過再執行；其餘照上游 |
+| `tests/contracts/test_bar_chart_format_contract.py` | 上游釘死 `formatValue` 這個實作；本 fork 保留自己的 `decimals` 屬性做法（見 `docs/DECISIONS.md` 2026-09-13），測試改為斷言同一性質（資料標籤不套用一位小數的軸刻度格式） |
+| `tests/contracts/test_skill_reference_paths.py` | 引用路徑檢查先去掉 `:行號`／`:起-訖` 後綴（本 fork 的 `docs/DECISIONS.md` 用 `path:line` 引用程式位置） |
+| `tools/audio/piper_tts.py`、`tools/video/video_trimmer.py`、`scripts/backlot_simulate_run.py`、`tools/video/hyperframes_compose.py`、`tools/subtitle/subtitle_gen.py`、`tools/graphics/diagram_gen.py`、`remotion-composer/src/components/charts/BarChart.tsx` | 與上游同步時衝突、保留 fork 先前修法並併入上游新增部分的檔案；逐檔理由見 `docs/DECISIONS.md` 2026-11-10 |
+| `.github/dependency-deferrals.json` | 依賴新鮮度的「看過、這次不升」清單（含 `certifi`、`pythainlp`） |
 
 核心模組在 `tools/`、流水線定義在 `pipeline_defs/`、技能庫在 `skills/`、Remotion 合成在 `remotion-composer/`，以上游為準。
 

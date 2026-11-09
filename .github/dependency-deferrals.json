@@ -120,6 +120,18 @@
       "reviewed": "2026-11-05",
       "revisit": "2026-12-05",
       "reason": "Retain upstream >=14.0 floor; defer baseline adoption until Eleven v4 Turbo and realtime transport behavior is checked on 17.4, beyond the prior 17.3 evidence."
+    },
+    "certifi": {
+      "deferredLatest": "2026.10.23",
+      "reviewed": "2026-11-10",
+      "revisit": "2026-12-10",
+      "reason": "Retain the upstream security floor 2026.10.19 (eMudhra intermediate CA replacement); the floor is a compatibility promise, and the 2026.10.23 release notes were not reviewed, so the floor is not raised in this pass."
+    },
+    "pythainlp": {
+      "deferredLatest": "5.4.0",
+      "reviewed": "2026-11-10",
+      "revisit": "2026-12-10",
+      "reason": "Retain upstream >=5.0 floor (new with the Thai caption work); the Thai caption tests pass on 5.4.0, which is the version installed for review."
     }
   }
 }
