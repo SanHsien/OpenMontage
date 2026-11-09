@@ -590,9 +590,9 @@ try {
 
 **水位**：`tools/upstream_baseline.json` 的 `reviewed_through` `e01dbf4`→`195eab2`（完整 SHA）、`reviewed_pr_through` 863→885、`reviewed_issue_through` 856→880、`reviewed_date` 2026-11-02。
 
-## 2026-11-10：上游審查（commit `195eab2`..`fecb9a1`、PR #886–#924、Issue #886–#917）
+## 2026-11-10：上游審查（commit `195eab2`..`fecb9a1`、PR #886–#925、Issue #886–#917）
 
-**範圍**：上游 `main` 自 `195eab2` 前進到 `fecb9a1e3cc23ef84de30b272059457a427f16f8`；`--strict` 列出 224 個 commit（第一親代鏈 70 筆：67 筆 PR 合併、3 筆直接提交 `d21f5d4`、`63d1087`〔#897〕、`fecb9a1`〔#905〕）、31 筆 PR（#889–#922，審查途中 `--strict` 重跑又多出 #923、#924，一併處理，共 33 筆）、4 筆 Issue（#886–#888、#917）。224 筆中日期早到 2026-08-26 的是 PR 分支上的原始提交，上游 2026-11-07 起才合併進 `main`，所以排在 baseline 之後。相對 `195eab2` 共 218 檔 +17,484／-634。水位：commit `195eab2`→`fecb9a1`、PR 885→924、Issue 880→917。沒有對上游留言、開 PR 或 push。
+**範圍**：上游 `main` 自 `195eab2` 前進到 `fecb9a1e3cc23ef84de30b272059457a427f16f8`；`--strict` 列出 224 個 commit（第一親代鏈 70 筆：67 筆 PR 合併、3 筆直接提交 `d21f5d4`、`63d1087`〔#897〕、`fecb9a1`〔#905〕）、31 筆 PR（#889–#922，審查途中 `--strict` 重跑又多出 #923、#924、#925，與 #925 一併處理，共 34 筆）、4 筆 Issue（#886–#888、#917）。224 筆中日期早到 2026-08-26 的是 PR 分支上的原始提交，上游 2026-11-07 起才合併進 `main`，所以排在 baseline 之後。相對 `195eab2` 共 218 檔 +17,484／-634。水位：commit `195eab2`→`fecb9a1`、PR 885→925、Issue 880→917。沒有對上游留言、開 PR 或 push。
 
 **方法**：fork 與上游沒有共同祖先，所以先 `git fetch upstream main`，再 `git diff 195eab2 upstream/main` 取得整段差異，以 `git apply -3 --index` 套用；13 檔衝突，逐檔手解（下表），其餘乾淨套用。未合併 PR 取每筆**目前**的 head，用 `gh pr diff`（唯讀）抓 diff。隱藏內容掃描（`\S\s{40,}\S`、`eval(`／`new Function(`／`globalThis`／`atob(`／`fromCharCode`、120 字元以上 base64 長串、零寬與雙向控制字元、控制碼、`curl|bash`／`iwr|iex`／`bypass`／`dangerously`／`skip-permissions`、超過 400 字元的新增行）：整段合併差異與 22 筆未合併 PR 的 diff 都沒有零寬、雙向控制、控制碼、base64 命中，`eval`／`atob` 等 0 命中。需要人看的命中有兩處：`tools/minicut_cli.py` 的安裝提示字串含 `curl -fsSL https://minicut.ai/install.sh | bash`（只是錯誤訊息，程式不會執行它；處理見下），以及 Markdown 與 JSON 的長段落（`tools/provider_contracts/pika_h3_flex.json`、技能文件、README 翻譯）。
 
@@ -632,6 +632,7 @@ try {
 | PR #913 | open `cd7f4e65` | +8/-5 4 檔 | **採用(同上游 diff)，測試加調整** | `skills/core/remotion.md`、`skills/creative/bg-remove-usage.md`、`skills/creative/lip-sync-usage.md` 引用的路徑不存在（「skills/styles/」、「tools/bg_remove.py」、「tools/lip_sync.py」），改成實際路徑；同 PR 擴大 `tests/contracts/test_skill_reference_paths.py` 的檢查範圍，套上測試後 12 個失敗，其中 9 個是本 fork `docs/DECISIONS.md` 的 `path:line` 引用被誤判（`path:行,行` 的寫法到第二次全量才發現），見上方調整 |
 | PR #923 | open `b1abd981` | +115/-1 2 檔 | **採用(同上游 diff)** | 渲染前的 slideshow 閘門只認場景清單；傳入 `scene_plan` 產出物（`{"version", "scenes"}`）時被當成鍵的迭代，評分丟例外被吞成警告，檢查等於沒執行。`tools/video/video_compose.py` 的 `_pre_compose_validation()` 改為先取出 `scenes`，並在輸入 schema 宣告 `scene_plan`。diff 與上游相同；新增的 `tests/tools/test_video_compose_scene_plan_artifact.py` 修前 6 個失敗、1 個通過，修後 7 個全過 |
 | PR #924 | open `60ab427e` | +93/-7 5 檔 | 延後 | `StatCard`、`HeroTitle` 的字型改吃主題標題字型；`TextCard` 的 `fontFamily` 屬性 fork 已有（`remotion-composer/src/components/TextCard.tsx`），diff 在 `Explainer.tsx` 與 `TextCard.tsx` 上無法直接套用。觸發=上游合併，或本機影片的數字卡／標題卡字型與主題不一致 |
+| PR #925 | open `c0dfe11d` | +254/-16 2 檔 | 延後 | 審查途中新增；放寬 `schemas/artifacts/edit_decisions.schema.json` 讓 Explainer 場景屬性通過驗證。schema 變更，需對照本 fork 的 `edit_decisions` 使用；diff 掃描 0 命中。觸發=上游合併 |
 | PR #909 | open `f37ec8e4` | +65/-10 2 檔 | 無需動作 | 上游 #703 已合併，`tools/analysis/frame_sampler.py` 已用暫存目錄只回報本次的影格；PR 的 4 個測試在合併後的樹上直接通過（`4 passed`） |
 | PR #891 | open `3ed54e09` | +418/-1 4 檔 | 延後 | 在工具執行時強制預算閘門（新 「tools/cost_gate.py」，改 `tools/tool_registry.py`，與合併後的 `tool_registry.py` 衝突）。行為變更且動到所有工具的執行路徑；本線沒有設預算上限的使用情境。觸發=上游合併，或本機啟用預算上限 |
 | PR #899 | open `9e4b67ce` | +786/-1 6 檔 | 延後 | Kling 4 經 MiniCut CLI 的新 provider，建立在 #900 之上，`docs/PROVIDERS.md` 衝突。本機沒有安裝 `minicut`，無法實跑。觸發=上游合併，或本機啟用 MiniCut |
