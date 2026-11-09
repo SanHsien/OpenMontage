@@ -1,5 +1,24 @@
 # 維護決策
 
+## 2026-11-10：四筆依賴新版重新審視，保留下限並續延
+
+**範圍**：`Dependency freshness` workflow（run 42673439625，main c5d7ac3）回報 `ruff`、`google-genai`、`openai`、`fastapi` 為 `REVIEW UPDATE`。
+
+**成因**：2026-11-05 的 6e1863d 之所以綠，是因為四筆都有 `deferredLatest` 延後（ruff 0.17.3、google-genai 2.34.0、openai 3.46.0、fastapi 0.162.0）。延後項依設計在 PyPI 超過審視版本時自動失效；後來 PyPI 出 ruff 0.17.4、google-genai 3.0.0、openai 3.48.0、fastapi 0.162.2，延後失效而轉紅。不是檢查被改動。
+
+| 套件 | 宣告下限 | 延後版本 → 本次 PyPI 版本 | 續延理由 |
+| --- | --- | --- | --- |
+| ruff | 0.9 | 0.17.3 → 0.17.4 | 維護 gate（ruff E9,F，範圍為 fork 工具）在 0.17.4 通過；產品樹不受 gate 檢查，升級依政策第 3 點獨立處理 |
+| google-genai | 1.0.0 | 2.34.0 → 3.0.0 | 離線 Google provider 測試在 3.0.0 通過；Lyria／Veo／Gemini Omni 雲端呼叫仍待另行授權的實測，且上游下限未變 |
+| openai | 2.44.0 | 3.46.0 → 3.48.0 | 離線 provider 測試在 3.48.0 通過；TTS／圖片／Sora 雲端呼叫未實測，上游下限未變 |
+| fastapi | 0.110 | 0.162.0 → 0.162.2 | 上游下限未變；維護 gate 在 0.162.2 通過 |
+
+**決定**：四筆均採指定版本延後，`reviewed: 2026-11-10`、`revisit: 2026-12-10`。不升下限：政策明定升下限不是消紅燈的出口，下限是相容承諾；上游 requirements 與本 fork 相同（僅 requirements-dev.txt 的 ruff 為本 fork 加入），沒有安全修正或 fork 需要的新 API 作為升級理由。google-genai 3、openai 3 為 major 版本，未讀完整 changelog 逐一核對呼叫點，故不宣稱相容，只記錄離線測試結果。
+
+**驗證**：`.venv` 內實裝 google-genai 3.0.0、openai 3.48.0、fastapi 0.162.2、ruff 0.17.4；`pip check` 無衝突；`tests/tools/test_google_imagen_gemini_backend.py`、`test_google_vertex_backends.py`、`test_provider_refresh.py` 與 `tests/contracts/test_phase3_contracts.py` 共 129 passed。這些是離線 mock 證據，不是雲端實測。
+
+**重評**：到期、PyPI 超過本次版本，或取得雲端實測條件／上游調整下限時重評。
+
 ## 2026-11-05：八筆依賴新版重新審視，保留下限並續延
 
 **範圍**：本機 `check_dependency_freshness.py --strict` 回報八筆 `REVIEW UPDATE`；工作樹起點 `c98eec01bf68f4e1f16be987c40ff86b1d15d5f0`，沒有前次未提交改動。

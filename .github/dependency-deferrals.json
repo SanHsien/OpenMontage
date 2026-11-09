@@ -20,10 +20,10 @@
       "reason": "maintainer test suite baseline; keeps minimum compatibility floor"
     },
     "ruff": {
-      "deferredLatest": "0.17.3",
-      "reviewed": "2026-10-28",
-      "revisit": "2026-11-28",
-      "reason": "maintainer linter baseline; bump tested separately from product changes"
+      "deferredLatest": "0.17.4",
+      "reviewed": "2026-11-10",
+      "revisit": "2026-12-10",
+      "reason": "Retain the >=0.9 linter floor; the maintenance gate (ruff E9,F on the maintained fork tools) passes on 0.17.4, the product tree is not linted by any gate, and a ruff bump lands on its own per review policy 3."
     },
     "pydantic": {
       "deferredLatest": "2.14.3",
@@ -68,22 +68,22 @@
       "reason": "Retain upstream >=2.0 floor; service-account Google TTS and Vertex AI authentication has no credential-backed smoke in this review."
     },
     "google-genai": {
-      "deferredLatest": "2.34.0",
-      "reviewed": "2026-11-05",
-      "revisit": "2026-12-05",
-      "reason": "Retain upstream >=1.0.0 floor; Lyria, Veo and Gemini Omni provider calls need separately authorized live validation before adopting a newer baseline."
+      "deferredLatest": "3.0.0",
+      "reviewed": "2026-11-10",
+      "revisit": "2026-12-10",
+      "reason": "Retain upstream >=1.0.0 floor; the offline Google provider tests (129 passed) run on 3.0.0, but Lyria, Veo and Gemini Omni live calls still need separately authorized validation, and upstream has not changed the floor."
     },
     "openai": {
-      "deferredLatest": "3.46.0",
-      "reviewed": "2026-11-05",
-      "revisit": "2026-12-05",
-      "reason": "Retain upstream >=2.44.0 Videos API floor; offline mocks do not validate live TTS, image and video calls with the newer SDK baseline."
+      "deferredLatest": "3.48.0",
+      "reviewed": "2026-11-10",
+      "revisit": "2026-12-10",
+      "reason": "Retain upstream >=2.44.0 Videos API floor; the offline provider tests (129 passed) run on 3.48.0, but live TTS, image and Sora calls are not validated and upstream has not changed the floor."
     },
     "fastapi": {
-      "deferredLatest": "0.162.0",
-      "reviewed": "2026-10-24",
-      "revisit": "2026-11-24",
-      "reason": "upstream runtime compatibility floor; tracking calesthio/OpenMontage baseline"
+      "deferredLatest": "0.162.2",
+      "reviewed": "2026-11-10",
+      "revisit": "2026-12-10",
+      "reason": "Retain upstream >=0.110 runtime floor; tracking calesthio/OpenMontage baseline, which is unchanged; the maintenance gates pass on 0.162.2."
     },
     "uvicorn": {
       "deferredLatest": "0.54.0",
