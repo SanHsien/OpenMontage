@@ -17,6 +17,8 @@
 
 **驗證**：`.venv` 內實裝 google-genai 3.0.0、openai 3.48.0、fastapi 0.162.2、ruff 0.17.4；`pip check` 無衝突；`tests/tools/test_google_imagen_gemini_backend.py`、`test_google_vertex_backends.py`、`test_provider_refresh.py` 與 `tests/contracts/test_phase3_contracts.py` 共 129 passed。這些是離線 mock 證據，不是雲端實測。
 
+**Python 版本與重審重點**：PyPI 上 google-genai 自 2.34.0 起 `requires_python >=3.11`，3.0.0 亦同；CI matrix 仍含 3.10，因下限 `>=1.0.0` 無上限，3.10 會自動解析到 2.x，不會壞。3.11 以上的新安裝會直接拿到 3.0.0（Developer API 預設 `v1`、HTTP client 改 `httpx2`、改用 OS trust store），這是既有的執行期風險、非本次引入；2026-12-10 重審時優先實測 Lyria、Veo、Gemini Omni 的雲端呼叫。
+
 **重評**：到期、PyPI 超過本次版本，或取得雲端實測條件／上游調整下限時重評。
 
 ## 2026-11-05：八筆依賴新版重新審視，保留下限並續延
