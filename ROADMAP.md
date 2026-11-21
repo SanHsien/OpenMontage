@@ -7,7 +7,9 @@
 這是 Windows 原生的 AI 影片製作維護 fork（[AGENTS.md:7](AGENTS.md)、[README.md:62](README.md)）。2026-10-29 `gh` 查詢顯示 CI、CodeQL、Dependency freshness、Upstream check 最近結果成功，Dependabot 與 code scanning 開啟告警皆為 0；issues 停用，未查到 issue，不能當成零筆（2026-10-29 `gh` 查詢）。目前限制是雲端 OpenAI 工具只有 mock 驗證，語料 Dependabot 新設定仍待下一次適用事件驗證（[docs/DECISIONS.md:462](docs/DECISIONS.md)、[docs/DECISIONS.md:481](docs/DECISIONS.md)）。2026-10-30 已核對最近 CI 的七項略過，皆為 FFmpeg／ffprobe 在 PATH 不可用；本機符號連結權限略過是另一情境，逐項證據見 [docs/DECISIONS.md](docs/DECISIONS.md)。
 
 ## 近期：可以直接動手
-目前沒有可直接動手的項目。
+| 項目 | 為什麼 | 驗收方式 | 建議執行者 | 證據 |
+| --- | --- | --- | --- | --- |
+| 重評 revisit 已到期的 6 筆依賴延後（httpx 0.28.1、jsonschema 4.26.0、python-dotenv 1.2.4、requests 2.34.2、uvicorn 0.54.0、watchfiles 1.3.0） | 中期「重評依賴延後紀錄」的觸發條件已成立：這 6 筆在 `.github/dependency-deferrals.json` 的 `revisit` 都是 2026-11-09，已過期；PyPI 最新版仍等於各自的 `deferredLatest`（2026-11-21 `pip index versions`），所以要判斷的是採用該版或寫理由續延，不是追新版。另有 pytest-asyncio 1.5.0、numpy 2.5.5 已高於 `deferredLatest`（1.4.1、2.5.4），它們的 revisit 2026-11-28／11-24 未到，可順便一起看 | 在乾淨環境測該版；`tools/dev_check.ps1` 與 `tools/test_fork_regressions.ps1` 通過；每筆在 `.github/dependency-deferrals.json` 採用（移除）或續延（新 `revisit` 與理由） | Codex | 2026-11-21 艦隊中期觸發巡檢；`.github/dependency-deferrals.json`；[docs/DECISIONS.md](docs/DECISIONS.md)（2026-11-05：八筆續延） |
 
 ## 中期：等條件成立再做
 | 項目 | 觸發條件 | 驗收方式 | 建議執行者 | 證據 |
