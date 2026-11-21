@@ -1,5 +1,41 @@
 # 維護決策
 
+## 2026-11-21：六筆到期的依賴延後重評；requests 下限因安全修正調高
+
+**範圍**：`.github/dependency-deferrals.json` 中 `revisit` 為 2026-11-09 的六筆（httpx、jsonschema、python-dotenv、requests、uvicorn、watchfiles），PyPI 現行版仍等於各自的 `deferredLatest`。另外兩筆 pytest-asyncio、numpy 因 PyPI 出新版已失效，一併處理。工作樹起點 `171f7a5`。
+
+**重讀延後理由**：六筆原本的理由都只有一句「維持相容下限／跟隨上游」，沒有測試證據，也沒有查過下限本身是否落在已知弱點範圍內。這次補上兩件事：在現行版實測，並向 OSV 查各下限版本（2026-11-21）。
+
+| 套件 | 宣告下限 | 現行版 | 下限的已知弱點（OSV） | 決定 |
+| --- | --- | --- | --- | --- |
+| httpx | 0.24 | 0.28.1 | 無 | 續延 |
+| jsonschema | 4.20 | 4.26.0 | 無 | 續延 |
+| python-dotenv | 1.0 | 1.2.4 | CVE-2026-28684（`set_key` 跟隨符號連結，1.2.2 修正） | 續延；本 repo 只呼叫 `dotenv_values`（`lib/env_loader.py`），沒有呼叫 `set_key` |
+| requests | 2.31 → **2.33.0** | 2.34.2 | CVE-2024-35195（2.32.0 修正）、CVE-2024-47081（`.netrc` 憑證外洩到惡意 URL，2.32.4 修正）、CVE-2026-25645（2.33.0 修正） | **下限調高到 2.33.0**，其上到 2.34.2 續延 |
+| uvicorn | 0.29 | 0.54.0 | 無 | 續延 |
+| watchfiles | 0.21 | 1.3.0 | 無 | 續延 |
+| pytest-asyncio | 0.23 | 1.4.1 → 1.5.0 | 未查 | 續延 |
+| numpy | 1.24 | 2.5.4 → 2.5.5 | 未查 | 續延；2.5.5 要 Python >=3.12，3.10／3.11 會解析到範圍內較舊的版本 |
+
+**決定**：
+
+- **requests 下限 `>=2.31` → `>=2.33.0`**。這不是為了讓報告變綠（調高後 2.34.2 仍高於下限，延後紀錄照留），而是 2026-11-10 裁決列出的升級理由「安全修正」這次成立：產品有 186 處 `requests` 呼叫會連到素材來源與服務端點，`.netrc` 外洩（CVE-2024-47081）在預設的 `trust_env` 下碰得到。取 2.33.0 是因為它是沒有已知弱點的最低版本；下限是相容承諾，不多拉。這是 `requirements.txt` 第一處與上游不同的宣告，日後合併上游時這一行要保留本 fork 的值，除非上游的下限更高。
+- 其餘七筆下限不動，`reviewed: 2026-11-21`、`revisit: 2026-12-21`，理由欄改寫成各自的實測證據。python-dotenv 的重評條件：本 repo 一旦使用 `set_key` 或任何會寫 `.env` 的 API，下限就調到 `>=1.2.2`。
+
+**驗證**（Windows 11、Python 3.14.10，暫存目錄內新建的乾淨 venv，`pip install -r requirements-dev.txt`，`pip check` 無衝突）：
+
+- 實裝版本即現行版：httpx 0.28.1、jsonschema 4.26.0、python-dotenv 1.2.4、requests 2.34.2、uvicorn 0.54.0、watchfiles 1.3.0、pytest-asyncio 1.5.0、numpy 2.5.5。
+- `tools/dev_check.ps1` exit 0（32 passed、16 份文件 0 斷鏈）；`tools/test_product.ps1` exit 0。
+- `tools/test_fork_regressions.ps1` exit 1：812 passed、5 skipped、1 failed。失敗的是 `tests/backlot/test_server.py::TestBacklotPerformanceBudgets::test_projects_and_state_stay_within_loose_budgets`（冷啟動 `/api/projects` 12.7 秒，預算 2.0 秒）。單獨重跑五次為 2 過 3 不過（2.7～5.9 秒）。cProfile 顯示時間花在 `_io.open`／`_io.open_code`（每次開檔 5～9 毫秒），不在任何套件的程式裡；同一台機器上 `tools/tests` 跑了 40 秒，CI 是 1.12 秒。對照組是 [CI run 44870503353](https://github.com/SanHsien/OpenMontage/actions/runs/44870503353)（`171f7a5`）：Python 3.14 job 的安裝記錄是同一組版本，Python 3.10～3.14 全綠，3.14 為 805 passed、13 skipped。所以判定為本機檔案 I/O 延遲造成的計時失敗，不是相依套件造成；但本機這道 gate 沒有綠，如實記錄。
+- uvicorn 與 watchfiles 沒有任何測試匯入，另做手動煙霧測試：用 uvicorn 0.54.0 實際啟動 `python -m backlot serve`，`/api/health`、`/api/projects`、`/` 皆回 200；用 watchfiles 1.3.0 的 `awatch`（`recursive=True, step=400`，與 `backlot/server.py` 相同參數）在暫存目錄偵測到檔案寫入。
+- requests 下限：同一 venv 降到 requests 2.33.0，`pip check` 無衝突，11 個匯入 `requests` 的測試檔 335 passed。
+
+**限制**：只在 Python 3.14 本機實測；3.10～3.13 的證據來自上述 CI。requests 2.33.0 只跑了匯入它的測試檔，不是完整回歸。httpx、jsonschema 等的 release notes 沒有逐版讀。這些都是離線證據，沒有雲端服務實測。
+
+**沒有處理的七筆**：同一次 strict 檢查另有 ruff 0.17.6、pydantic 2.14.4、certifi 2026.11.20、google-auth 2.63.0、google-genai 3.6.1、openai 3.57.0、fastapi 0.165.0 為 `REVIEW UPDATE`。上述乾淨 venv 與 CI 裝的就是這些版本，gate 結果同上，可當起點；但 ruff 要獨立落地、google-genai／openai 跨多版要讀 changelog、certifi 要看信任根異動，所以不在這次順手續延，已列入 ROADMAP 近期。在那之前 `Dependency freshness` workflow 是紅的。
+
+**重評**：2026-12-21 到期、PyPI 超過本次版本，或上游調整下限時。
+
 ## 2026-11-10：四筆依賴新版重新審視，保留下限並續延
 
 **範圍**：`Dependency freshness` workflow（run 42673439625，main c5d7ac3）回報 `ruff`、`google-genai`、`openai`、`fastapi` 為 `REVIEW UPDATE`。

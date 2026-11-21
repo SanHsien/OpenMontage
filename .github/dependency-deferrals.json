@@ -8,16 +8,16 @@
       "reason": "maintainer test suite baseline; keeps minimum compatibility floor across python 3.10-3.14"
     },
     "pytest-asyncio": {
-      "deferredLatest": "1.4.1",
-      "reviewed": "2026-10-28",
-      "revisit": "2026-11-28",
-      "reason": "maintainer test suite baseline; keeps minimum compatibility floor across python 3.10-3.14"
+      "deferredLatest": "1.5.0",
+      "reviewed": "2026-11-21",
+      "revisit": "2026-12-21",
+      "reason": "Retain the >=0.23 floor across Python 3.10-3.14; tested on 1.5.0 (clean Python 3.14 venv on 2026-11-21: dev_check and test_product green, fork regressions 812 passed with one local timing-budget flake; CI run 44870503353 green on Python 3.10-3.14 with this version)."
     },
     "httpx": {
       "deferredLatest": "0.28.1",
-      "reviewed": "2026-10-09",
-      "revisit": "2026-11-09",
-      "reason": "maintainer test suite baseline; keeps minimum compatibility floor"
+      "reviewed": "2026-11-21",
+      "revisit": "2026-12-21",
+      "reason": "Retain the >=0.24 test-client floor: no known advisory on the floor (OSV, 2026-11-21) and no fork need for a newer API. Tested on 0.28.1 (clean Python 3.14 venv on 2026-11-21: dev_check and test_product green, fork regressions 812 passed with one local timing-budget flake; CI run 44870503353 green on Python 3.10-3.14 with this version)."
     },
     "ruff": {
       "deferredLatest": "0.17.4",
@@ -33,15 +33,15 @@
     },
     "jsonschema": {
       "deferredLatest": "4.26.0",
-      "reviewed": "2026-10-09",
-      "revisit": "2026-11-09",
-      "reason": "upstream runtime compatibility floor; tracking calesthio/OpenMontage baseline"
+      "reviewed": "2026-11-21",
+      "revisit": "2026-12-21",
+      "reason": "Retain upstream >=4.20 floor: no known advisory on the floor (OSV, 2026-11-21) and upstream has not moved it. Tested on 4.26.0 (clean Python 3.14 venv on 2026-11-21: dev_check and test_product green, fork regressions 812 passed with one local timing-budget flake; CI run 44870503353 green on Python 3.10-3.14 with this version)."
     },
     "python-dotenv": {
       "deferredLatest": "1.2.4",
-      "reviewed": "2026-10-09",
-      "revisit": "2026-11-09",
-      "reason": "upstream runtime compatibility floor; tracking calesthio/OpenMontage baseline"
+      "reviewed": "2026-11-21",
+      "revisit": "2026-12-21",
+      "reason": "Retain upstream >=1.0 floor: CVE-2026-28684 (fixed in 1.2.2) is in set_key, and this repo only calls dotenv_values (lib/env_loader.py); raise the floor to >=1.2.2 if set_key or any .env writer is ever used. Tested on 1.2.4 (clean Python 3.14 venv on 2026-11-21: dev_check and test_product green, fork regressions 812 passed with one local timing-budget flake; CI run 44870503353 green on Python 3.10-3.14 with this version)."
     },
     "Pillow": {
       "deferredLatest": "13.0.0",
@@ -50,16 +50,16 @@
       "reason": "upstream runtime compatibility floor; tracking calesthio/OpenMontage baseline"
     },
     "numpy": {
-      "deferredLatest": "2.5.4",
-      "reviewed": "2026-10-24",
-      "revisit": "2026-11-24",
-      "reason": "upstream runtime compatibility floor; tracking calesthio/OpenMontage baseline"
+      "deferredLatest": "2.5.5",
+      "reviewed": "2026-11-21",
+      "revisit": "2026-12-21",
+      "reason": "Retain upstream >=1.24 floor; 2.5.5 needs Python >=3.12, so 3.10/3.11 resolve an older release inside the range. Tested on 2.5.5 (clean Python 3.14 venv on 2026-11-21: dev_check and test_product green, fork regressions 812 passed with one local timing-budget flake; CI run 44870503353 green on Python 3.10-3.14 with this version)."
     },
     "requests": {
       "deferredLatest": "2.34.2",
-      "reviewed": "2026-10-09",
-      "revisit": "2026-11-09",
-      "reason": "upstream runtime compatibility floor; tracking calesthio/OpenMontage baseline"
+      "reviewed": "2026-11-21",
+      "revisit": "2026-12-21",
+      "reason": "Floor raised to >=2.33.0 on 2026-11-21 (clears CVE-2024-35195, CVE-2024-47081, CVE-2026-25645); not raised further because 2.33.0 is the lowest release without a known advisory and the floor is a compatibility promise. Tested on 2.34.2 (clean Python 3.14 venv on 2026-11-21: dev_check and test_product green, fork regressions 812 passed with one local timing-budget flake; CI run 44870503353 green on Python 3.10-3.14 with this version) and the requests-importing test files on 2.33.0."
     },
     "google-auth": {
       "deferredLatest": "2.62.1",
@@ -87,15 +87,15 @@
     },
     "uvicorn": {
       "deferredLatest": "0.54.0",
-      "reviewed": "2026-10-09",
-      "revisit": "2026-11-09",
-      "reason": "upstream runtime compatibility floor; tracking calesthio/OpenMontage baseline"
+      "reviewed": "2026-11-21",
+      "revisit": "2026-12-21",
+      "reason": "Retain upstream >=0.29 floor: no known advisory on the floor (OSV, 2026-11-21). No test imports uvicorn; on 0.54.0 a manual smoke served backlot (/api/health, /api/projects, /) on 2026-11-21, alongside clean Python 3.14 venv on 2026-11-21: dev_check and test_product green, fork regressions 812 passed with one local timing-budget flake; CI run 44870503353 green on Python 3.10-3.14 with this version."
     },
     "watchfiles": {
       "deferredLatest": "1.3.0",
-      "reviewed": "2026-10-09",
-      "revisit": "2026-11-09",
-      "reason": "upstream runtime compatibility floor; tracking calesthio/OpenMontage baseline"
+      "reviewed": "2026-11-21",
+      "revisit": "2026-12-21",
+      "reason": "Retain upstream >=0.21 floor: no known advisory on the floor (OSV, 2026-11-21). No test imports watchfiles; on 1.3.0 a manual awatch smoke saw a file change on Windows on 2026-11-21, alongside clean Python 3.14 venv on 2026-11-21: dev_check and test_product green, fork regressions 812 passed with one local timing-budget flake; CI run 44870503353 green on Python 3.10-3.14 with this version."
     },
     "torch": {
       "deferredLatest": "2.15.0",
