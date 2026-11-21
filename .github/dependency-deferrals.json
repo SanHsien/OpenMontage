@@ -20,10 +20,10 @@
       "reason": "Retain the >=0.24 test-client floor: no known advisory on the floor (OSV, 2026-11-21) and no fork need for a newer API. Tested on 0.28.1 (clean Python 3.14 venv on 2026-11-21: dev_check and test_product green, fork regressions 812 passed with one local timing-budget flake; CI run 44870503353 green on Python 3.10-3.14 with this version)."
     },
     "ruff": {
-      "deferredLatest": "0.17.4",
-      "reviewed": "2026-11-10",
-      "revisit": "2026-12-10",
-      "reason": "Retain the >=0.9 linter floor; the maintenance gate (ruff E9,F on the maintained fork tools) passes on 0.17.4, the product tree is not linted by any gate, and a ruff bump lands on its own per review policy 3."
+      "deferredLatest": "0.17.6",
+      "reviewed": "2026-11-22",
+      "revisit": "2026-12-22",
+      "reason": "Retain the >=0.9 linter floor: no known advisory on the floor (OSV, 2026-11-22) and no gate needs a newer rule. 0.17.5 and 0.17.6 release notes read: no stable rule added to E9/F; the two pyflakes changes (F823 false-negative fix, F841 ignoring __traceback_hide__) change nothing here. Tested on 0.17.6 (clean Python 3.14 venv, 2026-11-22): dev_check green, and ruff E9,F over the whole tree gives the same 15858 diagnostics as 0.17.4."
     },
     "pydantic": {
       "deferredLatest": "2.14.3",

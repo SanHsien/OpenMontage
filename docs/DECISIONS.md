@@ -1,5 +1,22 @@
 # 維護決策
 
+## 2026-11-22：ruff 0.17.6 重評，續延（獨立提交）
+
+**範圍**：`ruff` 的延後停在 0.17.4，PyPI 已到 0.17.6，延後失效。依審查政策第 3 點，ruff 單獨一個提交，不與同日其他依賴重評混在一起。
+
+**讀過的 release notes**：[0.17.5](https://github.com/astral-sh/ruff/releases/tag/0.17.5)、[0.17.6](https://github.com/astral-sh/ruff/releases/tag/0.17.6)。新規則（`ASYNC401`、`PLE0211`、`RUF202`）都在 preview，gate 沒開 preview。會碰到 gate 選的 `E9,F` 的只有兩項 pyflakes 變更：`F823` 修掉一個漏報、`F841` 忽略 `__traceback_hide__`。其餘是自動修正的 bug 修正與效能，gate 不跑 `--fix`。
+
+**決定**：續延到 0.17.6，`reviewed: 2026-11-22`、`revisit: 2026-12-22`，下限 `>=0.9` 不動（OSV 2026-11-22 查 0.9.0 無已知弱點；沒有 gate 需要更新的規則）。
+
+**驗證**（Windows 11、Python 3.14.10，暫存目錄內新建的乾淨 venv，實裝 ruff 0.17.6）：
+
+- `tools/dev_check.ps1` exit 0。
+- `F823` 的漏報修正可能在別處冒出新診斷，所以另外對整棵樹跑 `ruff check --select E9,F --target-version py310`，0.17.4 與 0.17.6 的診斷逐行相同（各 15858 筆，檔案、行號、規則都一樣；絕大多數是 `.agents/skills` 範例的星號匯入）。這棵樹不在任何 gate 內，數字只用來比較兩版，不是待修清單。
+
+**限制**：只比了 `E9,F`；其他規則族與 formatter 沒比，本 repo 也沒有用到。
+
+**重評**：2026-12-22 到期、PyPI 超過 0.17.6，或 gate 的規則範圍改變時。
+
 ## 2026-11-21：六筆到期的依賴延後重評；requests 下限因安全修正調高
 
 **範圍**：`.github/dependency-deferrals.json` 中 `revisit` 為 2026-11-09 的六筆（httpx、jsonschema、python-dotenv、requests、uvicorn、watchfiles），PyPI 現行版仍等於各自的 `deferredLatest`。另外兩筆 pytest-asyncio、numpy 因 PyPI 出新版已失效，一併處理。工作樹起點 `171f7a5`。
