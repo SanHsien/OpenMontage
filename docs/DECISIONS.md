@@ -1,5 +1,61 @@
 # 維護決策
 
+## 2026-11-22：六筆失效的依賴延後重評；python-dotenv 下限調高
+
+**範圍**：2026-11-21 留下的七筆 `REVIEW UPDATE` 中，ruff 已另案處理（下一節），這裡是其餘六筆：pydantic、certifi、google-auth、google-genai、openai、fastapi。另有維護者對 python-dotenv 下限的裁決。工作樹起點 `9dd5489`。google-auth 在重評期間從 2.63.0 出到 2.63.1，以 2.63.1 為準。
+
+**維護者裁決（2026-11-21）：下限不得落在已知弱點範圍內。** 這是單一規則，不看本 repo 有沒有呼叫到受影響的 API。昨天對 python-dotenv 的結論（「只呼叫 `dotenv_values`，所以 `>=1.0` 續延」）因此作廢。
+
+| 套件 | 宣告下限 | 延後版本 → 現行版 | release notes 中碰得到本 repo 的變更 | 決定 |
+| --- | --- | --- | --- | --- |
+| pydantic | 2.0 | 2.14.3 → 2.14.4 | 無。2.14.4 是修正與 JSON Schema 校正；`lib/config_model.py` 只用 `BaseModel`、`Field(default_factory=...)`、`model_validate` | 續延 |
+| certifi | 2026.10.19 | 2026.10.23 → 2026.11.20 | 只移除信任根、沒有新增：2026.10.23 移除兩個 eMudhra emSign 根；2026.11.20 移除 Buypass Class 2／3、QuoVadis Root CA 1 G3／3 G3、Certigna Root CA | 續延 |
+| google-auth | 2.0 | 2.62.1 → 2.63.1 | 無。2.62.2～2.63.1 是 mTLS 憑證輪替、Firebase token 驗證、Cloud Run SPIFFE、regional access boundary、jwt 憑證的 `universe_domain`；`tools/google_credentials.py` 只用 `service_account.Credentials.from_service_account_file` 與 `refresh(Request())` | 續延 |
+| google-genai | 1.0.0 | 3.0.0 → 3.6.1 | **有兩項，都來自 3.0.0**，見下方 | 續延，不宣稱相容 |
+| openai | 2.44.0 | 3.48.0 → 3.57.0 | 無。3.49.0～3.57.0 全是新增（typed async function tools、Live、Managed Agents、新模型代號），沒有 breaking change | 續延 |
+| fastapi | 0.110 | 0.162.2 → 0.165.0 | 0.162.6 不再支援 Python 3.10（3.10 會解析到範圍內的 0.162.5，不會壞）；其餘是相依清理的修正、參數擷取重構、要自己開的限制（`Depends(max_concurrency=...)`、request body 大小、表單解析），`backlot/server.py` 只有 GET 路由，沒有用到 | 續延 |
+| python-dotenv | 1.0 → **1.2.2** | 1.2.4（未變） | — | **下限調高到 1.2.2**，其上到 1.2.4 續延 |
+
+**google-genai 3.0.0 的兩項 breaking change**（2026-11-10 沒有讀完整 changelog，這次補讀）：
+
+1. **API key 模式的預設 API 版本從 `v1beta` 改成 `v1`**（Vertex 不受影響）。`tools/google_credentials.py` 的 `get_genai_client` 沒有指定 `api_version`，所以裝到 3.x 的環境裡，`google_music`（Lyria，`client.interactions.create`）與 `google_imagen` 的 Gemini 圖片路徑（`client.models.generate_content`）會改打 `v1`。用 mock transport 在 3.6.1 離線記錄到的實際路徑是 `POST /v1/interactions` 與 `POST /v1/models/<model>:generateContent`。release notes 明說部分 `-preview` 模型與別名只在 `v1beta`；本 repo 的 `lyria-3-pro-preview` 是否受影響、`v1` 是否提供 interactions，**沒有金鑰無法驗證**。同一個 repo 裡直接打 REST 的 `gemini_omni_video` 與 `google_imagen` 的 Imagen 路徑寫死 `v1beta`，不受這項影響。
+2. **API key 模式的 `generate_videos` 被 SDK 在本機直接拒絕**（3.6.1 實測丟 `ValueError`）。`tools/video/veo_video.py` 在呼叫前就以「Veo on the Gemini API retired on 2026-10-22」擋掉非 Vertex 的情況，所以這項不會多壞一條路。另外 Vertex 路徑用的 `generate_videos(prompt=..., image=...)` 參數形式在 3.x 會出 `DeprecationWarning`（改用 `source`），目前還能用。
+
+第 1 項不是這次續延引入的：下限 `>=1.0.0` 沒有上限，3.11 以上的新安裝自 2026-11-06 起就會拿到 3.x。續延不改變任何人實際裝到的版本，只是誠實記下「看過、沒有證據說它相容」。修法（在 `get_genai_client` 明確指定版本）要動產品程式且需要雲端實測才知道該指定哪一版，已列入 ROADMAP，不在這次依賴重評裡順手改。
+
+**python-dotenv 下限 `>=1.0` → `>=1.2.2`**：CVE-2026-28684（`set_key` 跟隨符號連結）在 1.2.2 修正，OSV 2026-11-22 查 1.0.0 與 1.2.1 都在範圍內、1.2.2 無已知弱點。取 1.2.2 是因為它是沒有已知弱點的最低版本；下限是相容承諾，不多拉。`requirements.txt` 與 `setup.py` 兩處宣告一起改。這是第二處與上游不同的下限，日後合併上游時保留本 fork 的值，除非上游的下限更高。
+
+**順手對齊**：`setup.py` 的 `requests>=2.31` 在 2026-11-21 調高 `requirements.txt` 時漏改，這次一併改成 `>=2.33.0`。裁決與理由同 2026-11-21，沒有新的判斷。
+
+**同一規則下還沒處理的下限**：這次對所有宣告下限都查了 OSV（2026-11-22）。除了上面兩筆，還有四筆落在已知弱點範圍內，都**沒有**在這次調高，因為它們不在這次範圍、而且有的要跳主版本，已列入 ROADMAP 等維護者裁決：
+
+| 套件 | 宣告下限 | 下限的已知弱點（OSV） | 沒有已知弱點的最低版本 |
+| --- | --- | --- | --- |
+| pydantic | 2.0 | CVE-2024-3772（email 驗證 ReDoS） | 2.4.0 |
+| pytest | 8.0 | CVE-2025-71176 | 9.0.3 |
+| Pillow | 10.0 | CVE-2023-4863、CVE-2023-50447、CVE-2024-28219，以及 2026 年多筆 | 13.0.0（即現行版） |
+| torch | 2.0 | CVE-2024-31580、CVE-2025-32434 等多筆；其中數筆 OSV 沒有列修正版本 | 未能確定 |
+
+其餘下限（pyyaml、jsonschema、numpy、certifi、google-auth、google-genai、openai、fastapi、uvicorn、watchfiles、websockets、pythainlp、pytest-asyncio、httpx、ruff、torchaudio、torchvision）OSV 無已知弱點。requests 已於 2026-11-21 處理。
+
+**決定**：六筆均採指定版本延後，`reviewed: 2026-11-22`、`revisit: 2026-12-22`，理由欄改寫成各自讀到的變更與實測證據。六筆的下限都不動。
+
+**驗證**（Windows 11、Python 3.14.10，暫存目錄內新建的乾淨 venv，`pip install -r requirements-dev.txt`，`pip check` 無衝突）：
+
+- 實裝版本即現行版：pydantic 2.14.4、certifi 2026.11.20、google-auth 2.63.1、google-genai 3.6.1、openai 3.57.0、fastapi 0.165.0（starlette 1.10.0）、python-dotenv 1.2.4。OSV 2026-11-22 查這七個版本皆無已知弱點。
+- `tools/dev_check.ps1` exit 0；`tools/test_product.ps1` exit 0。
+- `tools/test_fork_regressions.ps1`：818 passed、5 skipped、1 failed。失敗的是 `tests/backlot/test_server.py::TestBacklotPerformanceBudgets::test_projects_and_state_stay_within_loose_budgets`，與 2026-11-21 同一個本機計時測試（這台機器檔案 I/O 慢），以 CI 為對照。
+- 匯入或碰到這些套件的 24 個測試檔（Google／OpenAI provider、backlot server、TLS 信任根、`.env` 範例、設定模型等）單獨再跑一次：657 passed、1 skipped（上面那個計時測試排除在外）。
+- certifi：用 2026.11.20 的 bundle 對 `tools/`、`lib/`、`backlot/` 內出現的 99 個 https 主機做 TLS 握手（只握手、不送請求）：96 個通過、0 個憑證驗證失敗、3 個名稱無法解析（`api.videvo.net` 與兩個 `.invalid` 測試用名稱）。也就是這次移除的五個信任根，沒有一個是這些主機現在在用的。
+- SDK 呼叫面離線檢查（不連網）：google-genai 3.6.1 上 `types.HttpOptions`、`GenerateContentConfig`、`ImageConfig`、`Part.from_bytes`、`GenerateVideosConfig`、`Image`、`VideoGenerationReferenceImage`、`VideoGenerationReferenceType.ASSET` 與 `client.models.generate_content`、`client.interactions.create`、`client.operations.get`、`client.files.download` 都在；openai 3.57.0 上 `images.generate`／`edit`、`audio.speech.with_streaming_response.create`、`videos.create_and_poll`、`videos.download_content` 都在；google-auth 2.63.1 上 `service_account.Credentials.from_service_account_file` 與 `transport.requests.Request` 可匯入；`OpenMontageConfig()` 在 pydantic 2.14.4 可建立並 `model_dump`。
+- python-dotenv 下限：同一 venv 降到 python-dotenv 1.2.2，`pip check` 無衝突，匯入 dotenv 或 `lib/env_loader` 的測試檔（`tests/contracts/test_env_example.py`、`tests/tools/test_sora_video.py`、`tests/tools/test_stock_provider_detection.py`）12 passed。
+
+**限制**：只在 Python 3.14 本機實測；3.10～3.13 的證據來自 CI。全部是離線證據：沒有任何 Google、OpenAI 雲端呼叫，沒有用真的服務帳戶做過 `refresh`。「呼叫面都在」只證明名稱存在，不證明服務端行為。TLS 握手只代表 2026-11-22 這個網路看到的憑證鏈；CDN 換憑證後可能不同。python-dotenv 1.2.2 只跑了匯入它的測試檔，不是完整回歸。
+
+**參考**：[Pydantic 2.14.4](https://github.com/pydantic/pydantic/releases/tag/v2.14.4)、[certifi 2026.10.19...2026.11.20](https://github.com/certifi/python-certifi/compare/2026.10.19...2026.11.20)、[google-auth CHANGELOG](https://github.com/googleapis/google-cloud-python/blob/main/packages/google-auth/CHANGELOG.md)（原 repo 已封存並搬到這裡，所以 2026-11-05 查不到 release 頁）、[Gen AI SDK 3.0.0](https://github.com/googleapis/python-genai/releases/tag/v3.0.0)～[3.6.1](https://github.com/googleapis/python-genai/releases/tag/v3.6.1)、[OpenAI SDK 3.57.0](https://github.com/openai/openai-python/releases/tag/v3.57.0)、[FastAPI 0.165.0](https://github.com/fastapi/fastapi/releases/tag/0.165.0)、[GHSA-mf9w-mj56-hr94](https://github.com/advisories/GHSA-mf9w-mj56-hr94)（CVE-2026-28684）。
+
+**重評**：2026-12-22 到期、PyPI 超過本次版本、取得雲端實測條件，或上游調整下限時。
+
 ## 2026-11-22：ruff 0.17.6 重評，續延（獨立提交）
 
 **範圍**：`ruff` 的延後停在 0.17.4，PyPI 已到 0.17.6，延後失效。依審查政策第 3 點，ruff 單獨一個提交，不與同日其他依賴重評混在一起。

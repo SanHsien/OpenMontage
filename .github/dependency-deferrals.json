@@ -26,10 +26,10 @@
       "reason": "Retain the >=0.9 linter floor: no known advisory on the floor (OSV, 2026-11-22) and no gate needs a newer rule. 0.17.5 and 0.17.6 release notes read: no stable rule added to E9/F; the two pyflakes changes (F823 false-negative fix, F841 ignoring __traceback_hide__) change nothing here. Tested on 0.17.6 (clean Python 3.14 venv, 2026-11-22): dev_check green, and ruff E9,F over the whole tree gives the same 15858 diagnostics as 0.17.4."
     },
     "pydantic": {
-      "deferredLatest": "2.14.3",
-      "reviewed": "2026-11-05",
-      "revisit": "2026-12-05",
-      "reason": "Retain upstream >=2.0 compatibility floor; defer raising the baseline until validation/schema behavior is checked across the Python 3.10-3.14 matrix."
+      "deferredLatest": "2.14.4",
+      "reviewed": "2026-11-22",
+      "revisit": "2026-12-22",
+      "reason": "Retain upstream >=2.0 floor. 2.14.4 release notes read: fixes and JSON Schema corrections only; lib/config_model.py uses BaseModel, Field(default_factory) and model_validate, none of which changed. Tested on 2.14.4 (clean Python 3.14 venv on 2026-11-22: dev_check and test_product green, fork regressions 818 passed with one local timing-budget flake). The 2.0 floor sits inside CVE-2024-3772 (fixed in 2.4.0); raising it is queued in ROADMAP for a maintainer decision, not done here."
     },
     "jsonschema": {
       "deferredLatest": "4.26.0",
@@ -39,9 +39,9 @@
     },
     "python-dotenv": {
       "deferredLatest": "1.2.4",
-      "reviewed": "2026-11-21",
-      "revisit": "2026-12-21",
-      "reason": "Retain upstream >=1.0 floor: CVE-2026-28684 (fixed in 1.2.2) is in set_key, and this repo only calls dotenv_values (lib/env_loader.py); raise the floor to >=1.2.2 if set_key or any .env writer is ever used. Tested on 1.2.4 (clean Python 3.14 venv on 2026-11-21: dev_check and test_product green, fork regressions 812 passed with one local timing-budget flake; CI run 44870503353 green on Python 3.10-3.14 with this version)."
+      "reviewed": "2026-11-22",
+      "revisit": "2026-12-22",
+      "reason": "Floor raised to >=1.2.2 on 2026-11-22: the old >=1.0 floor sat inside CVE-2026-28684 (fixed in 1.2.2), and a lower bound must not fall inside a known-vulnerable range, whether or not this repo calls the affected API. Not raised further because 1.2.2 is the lowest release without a known advisory (OSV, 2026-11-22) and the floor is a compatibility promise. Tested on 1.2.4 (clean Python 3.14 venv on 2026-11-22: dev_check and test_product green, fork regressions 818 passed with one local timing-budget flake) and the dotenv-importing tests on 1.2.2."
     },
     "Pillow": {
       "deferredLatest": "13.0.0",
@@ -62,28 +62,28 @@
       "reason": "Floor raised to >=2.33.0 on 2026-11-21 (clears CVE-2024-35195, CVE-2024-47081, CVE-2026-25645); not raised further because 2.33.0 is the lowest release without a known advisory and the floor is a compatibility promise. Tested on 2.34.2 (clean Python 3.14 venv on 2026-11-21: dev_check and test_product green, fork regressions 812 passed with one local timing-budget flake; CI run 44870503353 green on Python 3.10-3.14 with this version) and the requests-importing test files on 2.33.0."
     },
     "google-auth": {
-      "deferredLatest": "2.62.1",
-      "reviewed": "2026-11-05",
-      "revisit": "2026-12-05",
-      "reason": "Retain upstream >=2.0 floor; service-account Google TTS and Vertex AI authentication has no credential-backed smoke in this review."
+      "deferredLatest": "2.63.1",
+      "reviewed": "2026-11-22",
+      "revisit": "2026-12-22",
+      "reason": "Retain upstream >=2.0 floor: no known advisory on the floor (OSV, 2026-11-22). CHANGELOG 2.62.2-2.63.1 read: mTLS rotation, Firebase token checks, Cloud Run SPIFFE, regional access boundary gating and universe_domain in jwt credentials; tools/google_credentials.py only calls service_account.Credentials.from_service_account_file and refresh(Request()), which are untouched. Tested on 2.63.1 (clean Python 3.14 venv on 2026-11-22: dev_check and test_product green, fork regressions 818 passed with one local timing-budget flake); the import surface resolves, but no credential-backed refresh was run."
     },
     "google-genai": {
-      "deferredLatest": "3.0.0",
-      "reviewed": "2026-11-10",
-      "revisit": "2026-12-10",
-      "reason": "Retain upstream >=1.0.0 floor; the offline Google provider tests (129 passed) run on 3.0.0, but Lyria, Veo and Gemini Omni live calls still need separately authorized validation, and upstream has not changed the floor."
+      "deferredLatest": "3.6.1",
+      "reviewed": "2026-11-22",
+      "revisit": "2026-12-22",
+      "reason": "Retain upstream >=1.0.0 floor: no known advisory on the floor (OSV, 2026-11-22). Release notes 3.0.0-3.6.1 read. Two 3.0.0 breaking changes reach this repo: (1) API-key clients default to v1 instead of v1beta - on 3.6.1 the SDK sends Lyria to /v1/interactions and Gemini image generation to /v1/models/*:generateContent (recorded offline with a mock transport), and whether v1 serves those models is not verified; (2) generate_videos is refused locally for API-key clients, which veo_video.py already blocks before calling. Offline evidence only (clean Python 3.14 venv on 2026-11-22: dev_check and test_product green, fork regressions 818 passed with one local timing-budget flake); live Lyria/Imagen/Veo validation is queued in ROADMAP."
     },
     "openai": {
-      "deferredLatest": "3.48.0",
-      "reviewed": "2026-11-10",
-      "revisit": "2026-12-10",
-      "reason": "Retain upstream >=2.44.0 Videos API floor; the offline provider tests (129 passed) run on 3.48.0, but live TTS, image and Sora calls are not validated and upstream has not changed the floor."
+      "deferredLatest": "3.57.0",
+      "reviewed": "2026-11-22",
+      "revisit": "2026-12-22",
+      "reason": "Retain upstream >=2.44.0 Videos API floor: no known advisory on the floor (OSV, 2026-11-22). Release notes 3.49.0-3.57.0 read: additive API surface (typed async function tools, Live, Managed Agents, new model identifiers) and no breaking change; images.generate/edit, audio.speech streaming, videos.create_and_poll and videos.download_content still resolve on 3.57.0. Tested on 3.57.0 (clean Python 3.14 venv on 2026-11-22: dev_check and test_product green, fork regressions 818 passed with one local timing-budget flake); live TTS, image and Sora calls are not validated."
     },
     "fastapi": {
-      "deferredLatest": "0.162.2",
-      "reviewed": "2026-11-10",
-      "revisit": "2026-12-10",
-      "reason": "Retain upstream >=0.110 runtime floor; tracking calesthio/OpenMontage baseline, which is unchanged; the maintenance gates pass on 0.162.2."
+      "deferredLatest": "0.165.0",
+      "reviewed": "2026-11-22",
+      "revisit": "2026-12-22",
+      "reason": "Retain upstream >=0.110 runtime floor: no known advisory on the floor (OSV, 2026-11-22). Release notes 0.162.3-0.165.0 read: 0.162.6 drops Python 3.10, so 3.10 resolves 0.162.5 inside the range; the rest is dependency-cleanup fixes, a parameter-extraction refactor and opt-in limits (Depends max_concurrency, request body size, form parsing) that backlot's GET-only server does not use. Tested on 0.165.0 (clean Python 3.14 venv on 2026-11-22: dev_check and test_product green, fork regressions 818 passed with one local timing-budget flake; tests/backlot/test_server.py runs against it)."
     },
     "uvicorn": {
       "deferredLatest": "0.54.0",
@@ -122,10 +122,10 @@
       "reason": "Retain upstream >=14.0 floor; defer baseline adoption until Eleven v4 Turbo and realtime transport behavior is checked on 17.4, beyond the prior 17.3 evidence."
     },
     "certifi": {
-      "deferredLatest": "2026.10.23",
-      "reviewed": "2026-11-10",
-      "revisit": "2026-12-10",
-      "reason": "Retain the upstream security floor 2026.10.19 (eMudhra intermediate CA replacement); the floor is a compatibility promise, and the 2026.10.23 release notes were not reviewed, so the floor is not raised in this pass."
+      "deferredLatest": "2026.11.20",
+      "reviewed": "2026-11-22",
+      "revisit": "2026-12-22",
+      "reason": "Retain the upstream security floor 2026.10.19: no known advisory on the floor (OSV, 2026-11-22). Bundle diffs read: 2026.10.23 drops the two eMudhra emSign roots, 2026.11.20 drops Buypass Class 2/3, QuoVadis Root CA 1 G3/3 G3 and Certigna Root CA; nothing is added. On 2026.11.20 a TLS handshake with the certifi bundle against the 99 https hosts named in tools/, lib/ and backlot/ gave 96 ok, 0 verification failures and 3 names that do not resolve (2026-11-22, one network). Also clean Python 3.14 venv on 2026-11-22: dev_check and test_product green, fork regressions 818 passed with one local timing-budget flake."
     },
     "pythainlp": {
       "deferredLatest": "5.4.0",
