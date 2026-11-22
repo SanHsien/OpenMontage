@@ -48,7 +48,7 @@
 - 匯入或碰到這些套件的 24 個測試檔（Google／OpenAI provider、backlot server、TLS 信任根、`.env` 範例、設定模型等）單獨再跑一次：657 passed、1 skipped（上面那個計時測試排除在外）。
 - certifi：用 2026.11.20 的 bundle 對 `tools/`、`lib/`、`backlot/` 內出現的 99 個 https 主機做 TLS 握手（只握手、不送請求）：96 個通過、0 個憑證驗證失敗、3 個名稱無法解析（`api.videvo.net` 與兩個 `.invalid` 測試用名稱）。也就是這次移除的五個信任根，沒有一個是這些主機現在在用的。
 - SDK 呼叫面離線檢查（不連網）：google-genai 3.6.1 上 `types.HttpOptions`、`GenerateContentConfig`、`ImageConfig`、`Part.from_bytes`、`GenerateVideosConfig`、`Image`、`VideoGenerationReferenceImage`、`VideoGenerationReferenceType.ASSET` 與 `client.models.generate_content`、`client.interactions.create`、`client.operations.get`、`client.files.download` 都在；openai 3.57.0 上 `images.generate`／`edit`、`audio.speech.with_streaming_response.create`、`videos.create_and_poll`、`videos.download_content` 都在；google-auth 2.63.1 上 `service_account.Credentials.from_service_account_file` 與 `transport.requests.Request` 可匯入；`OpenMontageConfig()` 在 pydantic 2.14.4 可建立並 `model_dump`。
-- python-dotenv 下限：同一 venv 降到 python-dotenv 1.2.2，`pip check` 無衝突，匯入 dotenv 或 `lib/env_loader` 的測試檔（`tests/contracts/test_env_example.py`、`tests/tools/test_sora_video.py`、`tests/tools/test_stock_provider_detection.py`）12 passed。
+- python-dotenv 下限：同一 venv 降到 python-dotenv 1.2.2，`pip check` 無衝突，匯入 dotenv 或 `lib/env_loader.py` 的測試檔（`tests/contracts/test_env_example.py`、`tests/tools/test_sora_video.py`、`tests/tools/test_stock_provider_detection.py`）12 passed。
 
 **限制**：只在 Python 3.14 本機實測；3.10～3.13 的證據來自 CI。全部是離線證據：沒有任何 Google、OpenAI 雲端呼叫，沒有用真的服務帳戶做過 `refresh`。「呼叫面都在」只證明名稱存在，不證明服務端行為。TLS 握手只代表 2026-11-22 這個網路看到的憑證鏈；CDN 換憑證後可能不同。python-dotenv 1.2.2 只跑了匯入它的測試檔，不是完整回歸。
 
