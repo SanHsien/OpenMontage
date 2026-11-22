@@ -9,7 +9,6 @@
 ## 近期：可以直接動手
 | 項目 | 為什麼 | 驗收方式 | 建議執行者 | 證據 |
 | --- | --- | --- | --- | --- |
-| 重評 7 筆因 PyPI 出新版而失效的依賴延後（ruff 0.17.6、pydantic 2.14.4、certifi 2026.11.20、google-auth 2.63.0、google-genai 3.6.1、openai 3.57.0、fastapi 0.165.0） | 2026-11-21 `python tools/check_dependency_freshness.py --strict` 對這 7 筆回報 `REVIEW UPDATE`（exit 1），所以 `Dependency freshness` workflow 在處理完之前是紅的。同日的八筆重評沒有處理它們：ruff 依審查政策第 3 點要獨立落地，google-genai／openai 跨了多個版本要讀 changelog，certifi 要讀信任根異動 | 逐筆讀 release notes；在乾淨環境測該版；`tools/dev_check.ps1` 與 `tools/test_fork_regressions.ps1` 通過；每筆採用或續延有理由，strict 檢查回到 exit 0 | Codex | [docs/DECISIONS.md](docs/DECISIONS.md)（2026-11-21：這 7 筆在乾淨 venv 的實裝版本與 gate 結果已記錄，可沿用為起點） |
 | 裁決四筆落在已知弱點範圍內的宣告下限（pydantic 2.0、pytest 8.0、Pillow 10.0、torch 2.0） | 維護者 2026-11-21 裁決「下限不得落在已知弱點範圍內」，已套用到 requests 與 python-dotenv；2026-11-22 對所有下限查 OSV，還有這四筆在範圍內。沒有已知弱點的最低版本分別是 pydantic 2.4.0、pytest 9.0.3、Pillow 13.0.0（即現行版，要跳三個主版本），torch 有數筆 OSV 沒列修正版本 | 逐筆決定調高到哪一版或記下例外理由；調高的在乾淨環境測該下限版本，`tools/dev_check.ps1` 與 `tools/test_fork_regressions.ps1` 通過；`requirements*.txt` 與 `setup.py` 一起改，並記入 `FORK.md` | 維護者裁決，Codex 執行 | [docs/DECISIONS.md](docs/DECISIONS.md)（2026-11-22：「同一規則下還沒處理的下限」表） |
 
 ## 中期：等條件成立再做
