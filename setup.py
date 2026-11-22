@@ -8,7 +8,7 @@ setup(
     python_requires=">=3.10",
     install_requires=[
         "pyyaml>=6.0",
-        "pydantic>=2.0",
+        "pydantic>=2.4.0",
         "jsonschema>=4.20",
         "python-dotenv>=1.2.2",
         "Pillow>=10.0",

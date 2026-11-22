@@ -1,5 +1,27 @@
 # 維護決策
 
+## 2026-11-22：其餘四筆宣告下限套用同一規則（pydantic、pytest 調高；Pillow、torch 記例外）
+
+**範圍**：同日稍早「同一規則下還沒處理的下限」表列出的四筆。規則不變：宣告下限不得落在已知弱點範圍內；規劃長逐筆裁決如下。
+
+| 套件 | 宣告下限 | 決定 | 理由 |
+| --- | --- | --- | --- |
+| pydantic | 2.0 → **2.4.0** | 調高 | CVE-2024-3772（email 驗證 ReDoS）在 2.4.0 修正；2.4.0 是沒有已知弱點的最低版本 |
+| pytest（dev） | 8.0 → **9.0.3** | 調高 | CVE-2025-71176 在 9.0.3 修正；僅影響維護者測試環境，同一規則不分產品與開發依賴 |
+| Pillow | 10.0 | **例外，不調高** | 沒有已知弱點的最低版本是 13.0.0（即現行版），要跳三個主版本，會把所有使用者釘在最新主版本；下限是相容承諾，不為此拉高 |
+| torch | 2.0 | **例外，不調高** | 數筆 OSV 沒列修正版本，找不到可宣稱「已清除」的下限；調高任何數字都只是猜 |
+
+兩處例外的重評觸發：上游調高對應下限、Pillow 或 torch 出現可用的修正版本資訊，或 2026-12-21（以先到者為準）。例外期間，實際新安裝仍會解析到現行版，風險落在刻意固定舊版的人。`requirements.txt`、`requirements-dev.txt`、`setup.py` 三處一起改（torch 只在 `requirements-gpu.txt`，未動）；這是第三、第四處與上游不同的下限，日後合併上游時保留本 fork 的值，除非上游更高。
+
+**驗證**（Windows 11、Python 3.11.15，暫存目錄內新建的乾淨 venv，`pip install -r requirements-dev.txt` 後強制 `pydantic==2.4.0`、`pytest==9.0.3`；pydantic 2.4.0 沒有 Python 3.14 的 wheel，所以下限測試用 3.11，不用 3.14）：
+
+- `pip check` 無衝突；實裝 pydantic 2.4.0（pydantic_core 2.10.0）、pytest 9.0.3、pytest-asyncio 1.5.0、jsonschema 4.26.0。pytest-asyncio 宣告下限仍是 0.23，但這次實裝解析到 1.5.0；舊版 0.23 與 pytest 9 是否相容沒有測，也沒有宣稱。
+- 匯入或碰到 pydantic 的測試檔（`tests/contracts/test_phase0_contracts.py`、`tests/tools/test_cost_tracker_governance.py` 與其餘引用 `config_model` 的測試）41 passed。
+- `tools/dev_check.ps1` exit 0；`tools/test_product.ps1` exit 0。
+- `tools/test_fork_regressions.ps1`：828 passed、5 skipped、1 failed。失敗的是 `tests/backlot/test_server.py::TestBacklotPerformanceBudgets::test_projects_and_state_stay_within_loose_budgets`，與前兩日同一個本機計時測試（這台機器檔案 I/O 慢），其餘全過。
+
+**限制**：只在 3.11 本機實測下限；其他 Python 版本的證據來自 CI。pytest 9.0.3 在 3.10 至 3.14 的可安裝性只由 CI 矩陣證明，本機沒有逐版測。
+
 ## 2026-11-22：六筆失效的依賴延後重評；python-dotenv 下限調高
 
 **範圍**：2026-11-21 留下的七筆 `REVIEW UPDATE` 中，ruff 已另案處理（下一節），這裡是其餘六筆：pydantic、certifi、google-auth、google-genai、openai、fastapi。另有維護者對 python-dotenv 下限的裁決。工作樹起點 `9dd5489`。google-auth 在重評期間從 2.63.0 出到 2.63.1，以 2.63.1 為準。

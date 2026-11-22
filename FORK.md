@@ -26,7 +26,7 @@
 | `tools/dev_check.ps1` | Windows 本機一鍵 gate（維護工具，不安裝重型依賴） |
 | `tools/bootstrap_dev.ps1` | Windows 本機一鍵初始化與驗收（支援 `-All` 參數安裝產品依賴） |
 | `tools/test_product.ps1` | Windows 原生產品測試執行腳本（驗證語法、註冊中心與 demo 清單） |
-| `requirements.txt` / `requirements-dev.txt` / `setup.py` | 產品與維護依賴清單（納入 ruff；`requests`、`python-dotenv` 下限因安全修正高於上游，見 `docs/DECISIONS.md` 2026-11-21、2026-11-22） |
+| `requirements.txt` / `requirements-dev.txt` / `setup.py` | 產品與維護依賴清單（納入 ruff；`requests`、`python-dotenv`、`pydantic`、`pytest` 下限因安全修正高於上游；Pillow、torch 下限落在已知弱點範圍內但記為例外，見 `docs/DECISIONS.md` 2026-11-21、2026-11-22） |
 | `.github/workflows/ci.yml` | 純 Windows 原生 CI (windows-latest Python 3.10–3.14 矩陣)：compile / ruff / 維護測試 / 連結檢查 |
 | `.github/workflows/upstream-check.yml` | 每週對 `upstream/main` 做未審查 commit、PR、issue 水位檢查 |
 | `.github/workflows/dependency-freshness.yml` | 每月依賴新鮮度檢查 |

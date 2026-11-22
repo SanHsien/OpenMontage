@@ -5,7 +5,7 @@
       "deferredLatest": "9.2.0",
       "reviewed": "2026-10-28",
       "revisit": "2026-11-28",
-      "reason": "maintainer test suite baseline; keeps minimum compatibility floor across python 3.10-3.14"
+      "reason": "maintainer test suite baseline; floor raised to 9.0.3 (lowest release clear of CVE-2025-71176) on 2026-11-22; see DECISIONS"
     },
     "pytest-asyncio": {
       "deferredLatest": "1.5.0",
@@ -29,7 +29,7 @@
       "deferredLatest": "2.14.4",
       "reviewed": "2026-11-22",
       "revisit": "2026-12-22",
-      "reason": "Retain upstream >=2.0 floor. 2.14.4 release notes read: fixes and JSON Schema corrections only; lib/config_model.py uses BaseModel, Field(default_factory) and model_validate, none of which changed. Tested on 2.14.4 (clean Python 3.14 venv on 2026-11-22: dev_check and test_product green, fork regressions 818 passed with one local timing-budget flake). The 2.0 floor sits inside CVE-2024-3772 (fixed in 2.4.0); raising it is queued in ROADMAP for a maintainer decision, not done here."
+      "reason": "Retain the current latest-tracking range above the raised floor. 2.14.4 release notes read: fixes and JSON Schema corrections only; lib/config_model.py uses BaseModel, Field(default_factory) and model_validate, none of which changed. Tested on 2.14.4 (clean Python 3.14 venv on 2026-11-22: dev_check and test_product green, fork regressions 818 passed with one local timing-budget flake). The floor was raised to 2.4.0 (lowest release clear of CVE-2024-3772) on 2026-11-22; see DECISIONS."
     },
     "jsonschema": {
       "deferredLatest": "4.26.0",
