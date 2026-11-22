@@ -192,7 +192,7 @@ Build prompts iteratively:
 
 Change one element at a time to understand what affects your output.
 
-Reference: [negative-prompt-alternatives.md](negative-prompt-alternatives.md)
+Reference: [negative-prompt-alternatives.md](rules/negative-prompt-alternatives.md)
 
 ---
 

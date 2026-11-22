@@ -41,6 +41,7 @@
 | `tests/contracts/test_skill_reference_paths.py` | 引用路徑檢查先去掉 `:行號`／`:起-訖` 後綴（本 fork 的 `docs/DECISIONS.md` 用 `path:line` 引用程式位置） |
 | `tools/audio/piper_tts.py`、`tools/video/video_trimmer.py`、`scripts/backlot_simulate_run.py`、`tools/subtitle/subtitle_gen.py`、`remotion-composer/src/components/charts/BarChart.tsx` | 與上游同步時衝突、保留 fork 先前修法並併入上游新增部分的檔案；逐檔理由見 `docs/DECISIONS.md` 2026-11-10 |
 | `tools/video/hyperframes_compose.py` | 衝突時取上游，保留 fork 先前加的 `encoding="utf-8"`、`errors="replace"` 子行程解碼補丁（Windows ANSI 碼頁） |
+| `.claude/skills/{text-to-speech,elevenlabs,ai-video-gen,d3-viz,remotion-best-practices,manimgl-best-practices,flux-best-practices}`、`.agents/skills/{manimgl-best-practices,flux-best-practices}` | 上游的兩套 skill 副本已分岔；`.claude` 版對齊較新的 `.agents` 版，並修四處失效的範例路徑／連結（見 `docs/DECISIONS.md` 2026-11-22 提示詞稽核） |
 | `.github/dependency-deferrals.json` | 依賴新鮮度的「看過、這次不升」清單（含 `certifi`、`pythainlp`） |
 
 核心模組在 `tools/`、流水線定義在 `pipeline_defs/`、技能庫在 `skills/`、Remotion 合成在 `remotion-composer/`，以上游為準。

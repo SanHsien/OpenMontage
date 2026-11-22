@@ -1,5 +1,26 @@
 # 維護決策
 
+## 2026-11-22：提示詞稽核：`.claude/skills` 對齊較新的 `.agents/skills`，修四處失效路徑
+
+**範圍**：艦隊提示詞稽核（批次 5）列出的 OpenMontage findings，逐條以 grep／`git log upstream/main` 查證後套用；規劃長裁決以較新的 `.agents` 版為準。
+
+| 檔案 | 問題（查證） | 處理 |
+| --- | --- | --- |
+| `.claude/skills/text-to-speech/SKILL.md` | 教 agent 用已退役的 HeyGen `/v1/audio` 端點；`.agents` 版（上游 10-23，`.claude` 版 06-29）明寫不要用，`tools/audio/heygen_tts.py` 只走 v3 | 內容改成 `.agents` 版 |
+| `.claude/skills/elevenlabs/SKILL.md` | 要使用者把 `ELEVENLABS_API_KEY` 放 `.env`；`.agents` 版（10-23，`.claude` 版 03-29）禁止叫使用者建 `.env`，並優先 `fal_elevenlabs_tts` | 內容改成 `.agents` 版（較新那份是收緊） |
+| `.claude/skills/ai-video-gen/SKILL.md` | 只列兩個 gateway；`.agents` 版（11-08）多官方 Kling 與 Pika 路徑，且警告 fal Kling 與官方 Kling 金鑰不能混用 | 內容改成 `.agents` 版 |
+| `.claude/skills/d3-viz/SKILL.md` | 寫 `chart-template.js`／`interactive-template.js`，`assets/` 實際是 `.jsx` | 改 `.jsx`（與 `.agents` 版相同） |
+| `.claude/skills/remotion-best-practices/SKILL.md` | 連到不存在的 `rules/sound-effects.md`，實際是 `rules/sfx.md` | 改連結（與 `.agents` 版相同） |
+| `{.agents,.claude}/skills/manimgl-best-practices/SKILL.md` | 「Working Examples」列的 5 個檔是 manimce 的檔名，manimgl 的 `examples/` 沒有 | 改列 manimgl `examples/` 實際存在的檔 |
+| `{.agents,.claude}/skills/flux-best-practices/AGENTS.md` | `negative-prompt-alternatives.md` 連結解析不到，檔案在 `rules/` | 改成 `rules/negative-prompt-alternatives.md` |
+| `AGENTS.md` | fork 刪了 `CLAUDE.md`，只剩這份會被 Claude Code／Codex 一律載入，卻只把 `AGENT_GUIDE.md` 當「詳細手冊」；上游各入口都要求先讀它的路由規則 | 加一句：處理影片製作或使用者請求前先讀 `AGENT_GUIDE.md` 的路由規則 |
+
+`.claude` 副本連到 `provider-refresh-oct23` 的相對連結改指 `../../../.agents/skills/provider-refresh-oct23/SKILL.md`（`.claude/skills` 沒有這份），其餘與 `.agents` 版逐位元組相同。
+
+**刻意不做**：`provider-refresh-oct23` 與 `text-to-speech` 綁日期的描述（「Free access ends November 30, 2026」）只 flag，repo 內沒有反證；`.cursor/rules/openmontage.mdc`、`.github/copilot-instructions.md` 的「MANDATORY」與 `AGENT_GUIDE.md:133` 的「CRITICAL reviewer finding」有理由且承載路由內容，不改。
+
+**同步上游時**：這些是上游檔；上游自己更新 `.claude/skills` 副本時以上游為準，若上游仍分岔就重做本次對齊。
+
 ## 2026-11-22：其餘四筆宣告下限套用同一規則（pydantic、pytest 調高；Pillow、torch 記例外）
 
 **範圍**：同日稍早「同一規則下還沒處理的下限」表列出的四筆。規則不變：宣告下限不得落在已知弱點範圍內；規劃長逐筆裁決如下。
