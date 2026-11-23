@@ -1,8 +1,20 @@
 ﻿name: CI
 
 on:
+  # Fork patch (docs/DECISIONS.md 2026-11-23, Actions usage): pushes skip changes that only touch
+  # fork notes and records the suite never reads. Pull requests stay unfiltered.
   push:
     branches: [main]
+    paths-ignore:
+      - "ROADMAP.md"
+      - "REVIEW.md"
+      - "FORK.md"
+      - "NOTICE.md"
+      - "upstream-review-report.md"
+      - "dependency-freshness-report.md"
+      - "docs/DECISIONS.md"
+      - "docs/UPSTREAM.md"
+      - "tools/upstream_baseline.json"
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -21,8 +33,10 @@ jobs:
     timeout-minutes: 20
     strategy:
       fail-fast: false
+      # Pull requests and manual runs test every supported version. Pushes to main test only
+      # the bounds (3.10 and 3.14) to cut Actions usage; see docs/DECISIONS.md 2026-11-23.
       matrix:
-        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+        python-version: ${{ fromJSON(github.event_name == 'push' && '["3.10", "3.14"]' || '["3.10", "3.11", "3.12", "3.13", "3.14"]') }}
     env:
       PYTHONUTF8: "1"
       PYTHONIOENCODING: "utf-8"

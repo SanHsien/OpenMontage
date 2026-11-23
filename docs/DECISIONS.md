@@ -1,5 +1,22 @@
 # 維護決策
 
+## 2026-11-23：GitHub 因 Actions 用量過大停用本 fork 的 Actions，削減用量
+
+**量測**（`gh run list -L 100`，2026-10-24..11-22）：CI 29 次 push（每次 Windows 5 格 matrix，計費 x2）、CodeQL 28 次 push（Windows）、Upstream check 13 次 push、Dependency freshness 10 次 push；排程本來就是每週（CodeQL、Upstream check，週一）或每月（Dependency freshness），不是主要來源。用量來自每次 push 的 CI 5 格 Windows 矩陣與 Windows 上的 CodeQL。
+
+| 檔案 | 改動（前 → 後） |
+| --- | --- |
+| `ci.yml` | push 的 matrix 5 格（3.10..3.14）→ 2 格（3.10、3.14）；pull request 與手動執行維持 5 格；push 略過只改維護紀錄的提交（`ROADMAP.md`、`REVIEW.md`、`FORK.md`、`NOTICE.md`、兩份報告、`docs/DECISIONS.md`、`docs/UPSTREAM.md`、`tools/upstream_baseline.json`） |
+| `codeql.yml` | push 只在 `**/*.py` 或該 workflow 改動時跑（原：每次 push）；runner Windows → Linux（Python 抽取不需建置，結果不依賴 OS，分鐘數約減半）；pull request 與每週排程不變 |
+
+**不動**：`upstream-check.yml`、`dependency-freshness.yml`（本來就只在相關檔案 push 或排程時跑，且是維護所需檢查）。`tools/tests/test_fork_docs.py::test_ci_covers_python_314` 釘住的 `"3.14"`、`windows / py`、`dev_check.ps1` 仍在 `ci.yml`。
+
+**預估**：CI 每次 push 的分鐘約 -60%，加上紀錄類提交略過，總用量約減半以上。
+
+**還原**：把 matrix 還原成靜態五格、移除兩個 workflow 的 `paths`／`paths-ignore`、CodeQL 改回 `windows-latest`。
+
+**重審條件**：Actions 重新啟用後再量一次；仍被限制就再降頻。
+
 ## 2026-11-22：提示詞稽核：`.claude/skills` 對齊較新的 `.agents/skills`，修四處失效路徑
 
 **範圍**：艦隊提示詞稽核（批次 5）列出的 OpenMontage findings，逐條以 grep／`git log upstream/main` 查證後套用；規劃長裁決以較新的 `.agents` 版為準。
