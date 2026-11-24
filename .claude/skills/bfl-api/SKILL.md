@@ -16,10 +16,10 @@ Use this skill when integrating BFL FLUX APIs into applications for image genera
 **Before generating images, verify your API key is set:**
 
 ```bash
-echo $BFL_API_KEY
+python -c "import os; print('OK: Key configured' if os.environ.get('BFL_API_KEY') else 'Error: BFL_API_KEY not set')"
 ```
 
-If empty or you see "Not authenticated" errors, see [API Key Setup](#api-key-setup) below.
+If not set or you see "Not authenticated" errors, see [API Key Setup](#api-key-setup) below.
 
 ## Important: Image URLs Expire in 10 Minutes
 
@@ -152,15 +152,16 @@ FLUX.2 models support multiple input images for combining elements, style transf
 ### Quick Check
 
 ```bash
-echo $BFL_API_KEY
+python -c "import os; print('OK: Key configured' if os.environ.get('BFL_API_KEY') else 'Error: BFL_API_KEY not set')"
 ```
 
 ### If Not Set
 
 1. **Get a key**: Go to https://dashboard.bfl.ai/get-started → Click **"Create Key"** → Select organization
 2. **Save to `.env`** (recommended for persistence):
+   Direct the user to edit their local `.env` privately; never request raw API keys in chat.
+   Do not read or display the key or `.env` contents in agent output.
    ```bash
-   echo 'BFL_API_KEY=bfl_your_key_here' >> .env
    echo '.env' >> .gitignore  # Don't commit secrets
    ```
 

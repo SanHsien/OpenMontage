@@ -9,11 +9,11 @@ description: How to obtain and configure a BFL API key
 
 ## Quick Validation
 
-Run this first to check if your key is configured and valid:
+Check presence only; this does not validate the key with the provider:
 
 ```bash
 # Check if key is set
-[ -z "$BFL_API_KEY" ] && echo "Error: BFL_API_KEY not set" || echo "OK: Key configured"
+python -c "import os; print('OK: Key configured' if os.environ.get('BFL_API_KEY') else 'Error: BFL_API_KEY not set')"
 ```
 
 If not set, follow the steps below.
@@ -29,27 +29,12 @@ If not set, follow the steps below.
 
 When `BFL_API_KEY` is not set in the current session:
 
-1. **Check for existing `.env`**:
-   ```bash
-   grep BFL_API_KEY .env 2>/dev/null
-   ```
-
-2. **If found, export it**:
-   ```bash
-   export BFL_API_KEY=$(grep BFL_API_KEY .env | cut -d '=' -f2)
-   ```
-
-3. **If not found, ask the user** for their key:
-   > "I need a BFL API key to generate images. Please:
-   > 1. Go to https://dashboard.bfl.ai/get-started
-   > 2. Click 'Create Key' and copy it
-   > 3. Paste it here"
-
-4. **Save and export**:
-   ```bash
-   echo 'BFL_API_KEY=bfl_provided_key' >> .env
-   echo '.env' >> .gitignore
-   export BFL_API_KEY=bfl_provided_key
-   ```
-
-Now `$BFL_API_KEY` is available for direct curl/API calls in the session.
+1. Direct the user to create a key at https://dashboard.bfl.ai/get-started.
+2. Have the user configure `BFL_API_KEY` privately in their local environment or `.env`;
+   never request raw API keys in chat. Never read or display `.env` contents,
+   credential assignments, or the key itself in agent output.
+3. Ensure `.env` is ignored by Git. The application's dotenv loader can load it;
+   a presence check only sees the current process environment. If using a shell
+   directly, have the user configure that shell privately before starting the agent.
+4. Re-run the presence check above and report only configured / not configured.
+   This check does not confirm authentication; API errors must be handled separately.

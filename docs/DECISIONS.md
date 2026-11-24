@@ -1,5 +1,102 @@
 # 維護決策
 
+## 2026-11-24：上游增量審查與 agent 憑證檢查
+
+範圍：目前工作樹 `codex/upstream-1124`，起始 HEAD `2942c696c3dce088a9342ed689f6389f28744388`；執行 `python tools/check_upstream_updates.py`（exit 0）得到 1 commit、31 PR、19 Issue。GitHub 將舊 calesthio URL 重新導向 OpenMontageInc，以下記錄 API 回傳的權威 URL。只修改及提交本分支，不推送、不開 PR、不切分支。
+
+路由：solo；使用者層 primary-attestation inspector exit 0，`gpt-6.2-sol/medium` 為 operator-attested with verified user-level provenance，非 runtime-verified；未派子代理。外部 diff 僅作資料閱讀，未執行其中腳本、安裝 plugin 或修改全域設定。
+
+### Commit 軸
+
+| 上游 | 決策 | 理由 |
+| --- | --- | --- |
+| [2e003e65fa99a0f329478a2c1cdcf26bc481933a](https://github.com/OpenMontageInc/OpenMontage/commit/2e003e65fa99a0f329478a2c1cdcf26bc481933a) | 拒絕 | 完整 diff 為四份 README 各加一個 Instagram 宣傳徽章，沒有產品／Windows 修正；不增加第三方追蹤圖片或 fork 文件維護差異。 |
+
+### PR 軸
+
+所有 PR 均已讀取 API 檔案差異；大型已拒整包僅審查範圍及相關變更，不宣稱逐行安全稽核。以下全部未合併；closed 不當成 merged。延後項釘住完整 head/state，head 或狀態移動會重新報警；實際使用需求也可先觸發重評。
+
+| 上游 PR | 狀態／head | 規模 | 決策 | 理由／觸發條件 |
+| --- | --- | --- | --- | --- |
+| [#926](https://github.com/OpenMontageInc/OpenMontage/pull/926) | closed `f269b25aead2a4ef155caf785a37a0a14824b0a3` | 38 檔 +6317/-4 | 拒絕 | 已關閉未合併；Apple Silicon MLX 教學管線夾帶個人環境報告與大量腳本，不適合 Windows 維護線。 |
+| [#927](https://github.com/OpenMontageInc/OpenMontage/pull/927) | open `d5167a45ddad19e2da710d5b67bb90b594665439` | 11 檔 +6196/-0 | 拒絕 | Flow CDP 操作登入 Chrome profile，並帶入個人製片計畫與 ZIP；不採用瀏覽器 session 自動化。 |
+| [#934](https://github.com/OpenMontageInc/OpenMontage/pull/934) | open `220e480aa20c1aea242f2f32bb790f6f71a484ef` | 2 檔 +49/-1 | 延後 | loopback 探測改成 connect=0.5/read=5 秒；上游合併或 Windows preflight 實測被 ComfyUI 探測拖慢時重評。 |
+| [#935](https://github.com/OpenMontageInc/OpenMontage/pull/935) | open `c6d23b8d841d8349dbbe1b386423bacc753fdd41` | 7 檔 +230/-79 | 延後 | Omni 1.2、Veo 路由與計價一起改；上游合併或本機 Omni/Veo 呼叫失敗時，先核對 google-genai 3.x 的 v1/v1beta 相容性再測。 |
+| [#936](https://github.com/OpenMontageInc/OpenMontage/pull/936) | open `3c43510a8f19a11ca6ea8213fa382d64e895f57c` | 7 檔 +2411/-1 | 延後 | 新增 MartLLM 付費 provider、價格契約與技能；上游合併或使用者指定 MartLLM 時，審核憑證傳送網域、成本與恢復契約後再採用。 |
+| [#938](https://github.com/OpenMontageInc/OpenMontage/pull/938) | open `5d34656ba0fddd834cf47b71fd04f8f06a03c4ab` | 2 檔 +388/-5 | 延後 | 新增 audio.music 解析、素材 staging 與 fade 欄位轉換，影響三種 render 路徑；上游合併或本機重現 #937 無聲音樂時，用離線素材先紅後綠再採用。 |
+| [#939](https://github.com/OpenMontageInc/OpenMontage/pull/939) | open `83b833b5434f6daa413b044cca0687c60d90fe0e` | 2 檔 +27/-3 | 延後 | 非 1 倍速時省略 trimAfter；Python adapter 測試不能證明 Remotion 畫面未截斷。上游合併或本機慢速影片黑尾時，先做真實片段驗收；併入既有慢速剪輯重評條件。 |
+| [#940](https://github.com/OpenMontageInc/OpenMontage/pull/940) | open `ea5da6552ea0f8c527f3a4522cc57b7888aba3ef` | 2 檔 +86/-2 | 延後 | 改為 sys.executable 同目錄優先並新增 check_dependencies；本 fork #894 已有 PATH 優先的 launcher 修正。上游合併或實際需要隔離同名 piper 版本時再測優先順序。 |
+| [#941](https://github.com/OpenMontageInc/OpenMontage/pull/941) | open `aa324080a2154908128359ef86ed0da1a8e379f2` | 6 檔 +632/-0 | 延後 | 新增圖片＋逐字稿 Shorts 腳本與 Layer 3 技能；上游合併或使用者明確要圖片 Shorts 時，先驗證 Rule Zero 管線與 Windows 執行，不把它當影片生成的 fallback。 |
+| [#942](https://github.com/OpenMontageInc/OpenMontage/pull/942) | closed `e07bfa34048bab9c06cfc024ee79e34740ad14e1` | 266 檔 +13685/-2235 | 拒絕 | 已關閉未合併的 266 檔稽核整包，混合 checkpoint、ComfyUI、新模型、離線 GSAP 與文件拆分；不以整包覆蓋 fork 的 gate、指引與既有修正。 |
+| [#943](https://github.com/OpenMontageInc/OpenMontage/pull/943) | open `7f8a76ced48ec5d7b9add63383d7a52be993cc18` | 4 檔 +241/-0 | 延後 | 新增 openskp[textures]==1.5.0 與 ZIP/SKP 轉 GLB 工具；上游合併或使用者提供 SKP 轉換需求時，先驗證 ZIP 路徑與 Windows 依賴。 |
+| [#958](https://github.com/OpenMontageInc/OpenMontage/pull/958) | open `479a20fe70542cbbf8adee042ae52c4dd0f2c98d` | 2 檔 +261/-57 | 延後 | Higgsfield host、Authorization 與模型路由整體遷移；上游合併或準備使用該 provider 時，依官方契約驗證離線 request 與報價，不執行付費呼叫。 |
+| [#959](https://github.com/OpenMontageInc/OpenMontage/pull/959) | open `a3ae5e8cc9e8de536e67a23682967fd3d3436fce` | 5 檔 +781/-4 | 拒絕 | 日文 README 以英文為正本並改四份語言導覽；本 fork 以繁中與 README.en.md 維護，沒有日文交付需求，不增加另一份易過期鏡像。 |
+| [#960](https://github.com/OpenMontageInc/OpenMontage/pull/960) | closed `9f362f05edb98e8f5be99d09ae25f4f4d27069c1` | 50 檔 +5659/-4 | 拒絕 | 已關閉未合併；50 檔另建 autopilot 規劃、資料庫與製片流程，不是既有 agent 管線的最小修正。 |
+| [#962](https://github.com/OpenMontageInc/OpenMontage/pull/962) | open `1d49d81f780802685d79c993277d48d03f4d227a` | 13 檔 +1553/-2 | 延後 | 另建 FastAPI Clip Studio 並改 video_trimmer portrait 與封裝依賴；上游合併或有手動剪輯 UI 需求時，先測檔案邊界、Windows 匯出與既有 concat。 |
+| [#963](https://github.com/OpenMontageInc/OpenMontage/pull/963) | open `ead1a4ecb4fcc6d1d72fa1e84f88e9034969b9f3` | 2 檔 +44/-0 | 延後 | 區分 Pika 輪詢 API 錯誤與工作失敗、保留 resume_job 避免重複付款；上游合併或本機遇到輪詢 429/5xx 誤報時，以只提交一次的測試重評。 |
+| [#965](https://github.com/OpenMontageInc/OpenMontage/pull/965) | open `0cb533b189147b65a4a9956cd8c649b3ab983b69` | 3 檔 +1494/-559 | 延後 | Remotion 4.0.545、fast-uri 與專案 Chrome 設定綁一起；上游合併、相依安全告警或需要本地 Chrome 時重評。現有設定以無 .exe 的路徑找 Chrome，尚無 Windows build 證據。 |
+| [#966](https://github.com/OpenMontageInc/OpenMontage/pull/966) | open `1f41b522172abffb1057af1471712071c2b1c12d` | 2 檔 +17/-0 | 拒絕 | 隱藏輸入用 zsh、Cmd+V 與 BSD sed -i，Windows 不相容；不引入只支援作者平台的憑證腳本。 |
+| [#968](https://github.com/OpenMontageInc/OpenMontage/pull/968) | open `e7cbc42376c1a60c4a834dfa760c035f938fb3e5` | 2 檔 +55/-1 | 延後 | 字幕快取身份補 corrections、max_chars_per_line、highlight_style；上游合併或本機開啟 asset cache 後字幕更正未生效時，使用兩次輸出驗證再採用。 |
+| [#969](https://github.com/OpenMontageInc/OpenMontage/pull/969) | open `c44fd8bf1469d308be94fead56fbbc80baa3cf3f` | 1 檔 +3/-0 | 延後 | ComparisonCard 補左右顏色傳遞；上游合併或需要逐欄指定顏色時，以實際 props 傳遞測試重評。 |
+| [#970](https://github.com/OpenMontageInc/OpenMontage/pull/970) | open `5012996da2292735dd7828d09095a352fb9d3777` | 5 檔 +105/-0 | 延後 | 讀過 5 檔完整 diff：marketplace/plugin manifests 只暴露既有技能、無新增 hook/MCP/執行腳本；但 manifest 不等於可安全執行。使用者要求安裝或上游合併後，先做 SkillSpector 與 verify_agent_skill_pack_safety.py --pack 的靜態稽核，再做有界本地 discovery；本輪不安裝、不發布、不宣稱 runtime 通過。 |
+| [#971](https://github.com/OpenMontageInc/OpenMontage/pull/971) | open `1fa409fb5814991a1522be280e2bc28d70c6a7e5` | 7 檔 +3202/-1 | 延後 | OpenRouter video 新增 live catalog、inline frames、報價與 resume；上游合併或使用者指定服務時，先驗證 catalog fallback、憑證網域與計費，不自動購買 credits。 |
+| [#972](https://github.com/OpenMontageInc/OpenMontage/pull/972) | open `6c3e52f9e5c2cd8932926ffa48ee88ff7092b212` | 34 檔 +7583/-13 | 延後 | Pexels null quality 修正有價值，但 34 檔 diff 同時夾帶 Flow 瀏覽器、OmniVoice、Fableframe、longform 管線與其他修正；上游拆成單一修正／合併，或本機重現 #967 時只取 Pexels 部分並補先紅後綠。 |
+| [#973](https://github.com/OpenMontageInc/OpenMontage/pull/973) | open `7cbec3361bde3f1da357bcc48ba302fb23dd231f` | 2 檔 +75/-2 | 拒絕 | 新增 Ubuntu Bandit/pip-audit 與 GitLab CI；會增加 Actions 成本並繞離現有 Windows 維護 gate。本 fork Actions 已遭停用，不能照搬另一套 CI。 |
+| [#974](https://github.com/OpenMontageInc/OpenMontage/pull/974) | open `295d99abc97da672f35fe9ffaace4a9fd7cb6579` | 8 檔 +49/-17 | 延後 | Backlot 例外收窄、HTTP loopback/HTTPS policy 橫跨多 provider 與 TS resolver，且無新測試；上游合併或有明確 HTTP 安全需求時，先驗證 LAN、signed URL、IPv6 與錯誤回報。 |
+| [#975](https://github.com/OpenMontageInc/OpenMontage/pull/975) | open `0c2d31f3558e24e14bb088b7cea15b7e94e280b4` | 8 檔 +679/-2 | 延後 | 新增 WaveSpeed 圖片／影片 provider 與 schema adapter；上游合併或使用者指定 WaveSpeed 時，先驗證 schema、成本與憑證邊界。 |
+| [#976](https://github.com/OpenMontageInc/OpenMontage/pull/976) | open `b8baed5ce8789cb8f11029b6c3547bf277493558` | 19 檔 +2946/-0 | 延後 | podcast 全長／多機剪輯依賴 Apple Vision Swift、MLX Whisper、VideoToolbox 與 shell setup；只有上游提供 Windows 路徑且有多機素材需求時才重評。 |
+| [#978](https://github.com/OpenMontageInc/OpenMontage/pull/978) | open `c56186af9ef0381a9666ed386b4f396ee1910fad` | 3 檔 +606/-1 | 延後 | cut_check 以 FFmpeg 全片量測黑幀、凍結、音量與音訊漂移，尚未接入 final review；上游合併或本機遇到抽樣 QA 漏掉剪接缺陷時，先用合成片段測 Windows 偵測。 |
+| [#979](https://github.com/OpenMontageInc/OpenMontage/pull/979) | open `51f0d86724266967fa2beab07d5f4bac47ec0b8d` | 5 檔 +40/-26 | 採用（本地重做） | 採用憑證不輸出／不進聊天的修正目的；兩份 BFL SKILL 與 reference 改跨平台 Python presence check，額外移除上游漏掉的裸 grep .env；不新增或安裝第三方技能。先紅 4 failed/6 passed，修後 18 passed（含假金鑰輸出測試）。 |
+| [#980](https://github.com/OpenMontageInc/OpenMontage/pull/980) | open `8b242731114fb786ebf332f783a005257bc2c101` | 6 檔 +19/-15 | 拒絕（已等效修復） | 完整 6 檔 diff 的路徑修正已在本地 fcb37d9 完成；本輪 6 個實際文件引用檢查通過，無須重複套用。 |
+| [#981](https://github.com/OpenMontageInc/OpenMontage/pull/981) | open `cd11539cb38f83d2a22f21f9e6ca673a01f2637c` | 12 檔 +753/-1 | 延後 | 新增 continuity ledger、prompt preflight 與 raccord sheet，改 cinematic agent 門檻；上游合併或使用者開始多 take 劇情片時，先檢查契約與 Windows FFmpeg，不對本次維護自動啟用。 |
+
+### Issue 軸
+
+| 上游 Issue | 狀態 | 決策 | 理由／觸發條件 |
+| --- | --- | --- | --- |
+| [#937](https://github.com/OpenMontageInc/OpenMontage/issues/937) | open | 延後 | 對應 #938；上游合併或本地重現 documentary-montage 音樂無聲時重評。 |
+| [#944](https://github.com/OpenMontageInc/OpenMontage/issues/944) | open | 延後 | 官方 Kling MCP/OAuth 是另一條付費與授權路徑；只有使用者要求此整合且靜態安全稽核通過時重評。 |
+| [#945](https://github.com/OpenMontageInc/OpenMontage/issues/945) | closed | 拒絕 | 已關閉；作者頻道直式教學構圖品質回報，沒有本 fork 素材或可定位的本地 producer，不以公開影片推定程式根因。 |
+| [#946](https://github.com/OpenMontageInc/OpenMontage/issues/946) | closed | 拒絕 | 已關閉；作者 .omc 私有 scorecard 與頻道 API 分頁／重複資料，不是本次 fork 的維護輸入。 |
+| [#947](https://github.com/OpenMontageInc/OpenMontage/issues/947) | closed | 拒絕 | 已關閉；作者頻道早期 worked-example 與內容節奏提案，非本 fork 已重現缺陷。 |
+| [#948](https://github.com/OpenMontageInc/OpenMontage/issues/948) | closed | 拒絕 | 已關閉；特定頻道標題／縮圖實驗與成長假說，沒有本 fork 的實驗資料，不能照搬勝出宣稱。 |
+| [#949](https://github.com/OpenMontageInc/OpenMontage/issues/949) | closed | 拒絕 | 已關閉；作者 Shorts Related Video 與排程交付流程，本輪未授權登入 YouTube 或修改頻道。 |
+| [#950](https://github.com/OpenMontageInc/OpenMontage/issues/950) | closed | 拒絕 | 已關閉；作者影片最終視覺／旁白證據需求；本輪沒有製片／發布工作，不開新 QA 框架。 |
+| [#951](https://github.com/OpenMontageInc/OpenMontage/issues/951) | closed | 拒絕 | 已關閉；Prefix sums 個別影片腳本，不屬於程式維護。 |
+| [#952](https://github.com/OpenMontageInc/OpenMontage/issues/952) | closed | 拒絕 | 已關閉；Monotonic stack 個別影片試作，不屬於程式維護。 |
+| [#953](https://github.com/OpenMontageInc/OpenMontage/issues/953) | closed | 拒絕 | 已關閉；負數 sliding window 個別影片試作，不屬於程式維護。 |
+| [#954](https://github.com/OpenMontageInc/OpenMontage/issues/954) | closed | 拒絕 | 已關閉；STAR 面試個別影片試作，不屬於程式維護。 |
+| [#955](https://github.com/OpenMontageInc/OpenMontage/issues/955) | closed | 拒絕 | 已關閉；cache race 個別影片試作，不屬於程式維護。 |
+| [#956](https://github.com/OpenMontageInc/OpenMontage/issues/956) | closed | 拒絕 | 已關閉；作者 YouTube roadmap 與五片試播整合，不取代本 fork 的 ROADMAP。 |
+| [#957](https://github.com/OpenMontageInc/OpenMontage/issues/957) | open | 延後 | 對應 #958；上游合併或使用 Higgsfield 前，以官方契約重評 host/auth/model 變更。 |
+| [#961](https://github.com/OpenMontageInc/OpenMontage/issues/961) | open | 延後 | Parallel keyless MCP search 尚為提案且依賴 #638；該共用 client 合併並有明確研究需求後才重評。 |
+| [#964](https://github.com/OpenMontageInc/OpenMontage/issues/964) | open | 採用（本地重做） | 對應 #979；修現有 BFL 指引的金鑰 echo、聊天索取與裸 grep 輸出，僅用假金鑰驗證。 |
+| [#967](https://github.com/OpenMontageInc/OpenMontage/issues/967) | open | 延後 | 對應 #972；上游拆分／合併 Pexels 修正或本機重現 quality:null 選最低解析度時重評。 |
+| [#977](https://github.com/OpenMontageInc/OpenMontage/issues/977) | open | 拒絕 | 個人 75 秒二次函數影片製作請求；不是產品 bug，不下載附件或執行製片。 |
+
+### Agent 檢查與採用驗收
+
+- #970 僅審 manifests 及安裝說明，沒有安裝或 runtime discovery claim；既有工具技能指標另跑本地契約測試。
+- #979 本地重做只修既有文件，未採納新第三方 Skill/MCP bundle。上游 patch 仍保留會印出整筆金鑰的裸 grep，因此不原樣套用；兩棵技能目錄同步修正。
+- 新增 `tools/tests/test_agent_skill_safety.py`，納入既有 dev_check：四份 BFL 文件禁止憑證輸出與聊天索取，使用空值／假金鑰執行文件中的 Python 指令，輸出只能是存在狀態；另查 #980 涉及的六份文件實際本地引用。
+- 修前同一批 BFL 安全檢查 4 failed、6 passed；修後含輸出驗證 18 passed。未讀取真實金鑰，未發送 API 請求。
+
+### 驗證
+
+| 指令／範圍 | 結果 |
+| --- | --- |
+| `python -m pytest -q -c tools/pytest.ini tools/tests/test_agent_skill_safety.py` | 修前 4 failed／6 passed，修後擴充輸出測試為 18 passed |
+| `.venv/Scripts/python.exe -m pytest -q tests/contracts/test_agent_instruction_integrity.py tests/contracts/test_agent_skill_pointers.py --basetemp scratch/upstream-1124-review/pytest` | 242 passed，exit 0；驗證既有 agent 指引與工具技能引用，沒有安裝 #970 |
+| `pwsh -NoProfile -File tools/dev_check.ps1` | exit 0；compile、Ruff 通過、維護測試 50 passed、16 份文件連結通過 |
+| `.venv/Scripts/python.exe -X utf8 tools/check_upstream_updates.py --strict`（新水位） | exit 0；behind 0、無新 PR／Issue、22 筆 monitored head/state 未變 |
+
+產品契約測試初次缺 jsonschema，補完後還缺 websockets；只在本工作樹新建 `.venv`（沿用已安裝套件），補 jsonschema 4.26.0、python-dotenv 1.2.4、websockets 17.4 及其依賴後通過。套件 cache 及審查暫存放在忽略的 scratch 下，未安裝全域工具、未修改依賴宣告。
+
+### 水位
+
+在採用的聚焦測試通過後，commit 水位 `fecb9a1e3cc23ef84de30b272059457a427f16f8` → `2e003e65fa99a0f329478a2c1cdcf26bc481933a`，PR 925 → 981，Issue 917 → 977，日期 2026-11-24。只推進以上逐筆已審項目；baseline 表示已審，並非已採用。後續待辦只列 ROADMAP；本節保留決策與觸發條件。
+
+
 ## 2026-11-23：GitHub 因 Actions 用量過大停用本 fork 的 Actions，削減用量
 
 **量測**（`gh run list -L 100`，2026-10-24..11-22）：CI 29 次 push（每次 Windows 5 格 matrix，計費 x2）、CodeQL 28 次 push（Windows）、Upstream check 13 次 push、Dependency freshness 10 次 push；排程本來就是每週（CodeQL、Upstream check，週一）或每月（Dependency freshness），不是主要來源。用量來自每次 push 的 CI 5 格 Windows 矩陣與 Windows 上的 CodeQL。

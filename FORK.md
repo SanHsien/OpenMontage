@@ -68,3 +68,7 @@ pwsh -NoProfile -File tools\bootstrap_dev.ps1
 ```
 
 要實際使用管線生成影片與啟動 Backlot 故事板，見 [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md)。
+
+## 2026-11-24：BFL agent 憑證指引
+
+依上游 #979／#964 的修正目的，本地同步修兩棵既有 BFL 技能文件：只回報金鑰存在狀態，不輸出 `.env`、不索取聊天金鑰。額外移除上游漏修的裸 grep；跨平台 Python 指令與文件引用由維護 gate 測試。決策見 [docs/DECISIONS.md](docs/DECISIONS.md)。
