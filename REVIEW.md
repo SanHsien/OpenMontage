@@ -78,6 +78,7 @@ gh repo set-default --view
 | R-34 | P3 | `check_links.py` 在 Windows 不分大小寫，GitHub 上 404 的連結會通過 | `6594f0b`（2026-10-28） |
 | R-35 | P3 | R-05 的 `bootstrap_dev.ps1`：gate 失敗仍以 0 結束 | `0abaa5c`（2026-10-28） |
 | R-36 | P2 | CI 只跑 `tools/tests`，fork 的產品回歸測試沒在 CI 跑；新增 `tools/test_fork_regressions.ps1` | `6875bfd`（2026-10-28） |
+| R-37 | P1 | 與 R-28 同類：兩份 video-toolkit 技能用 `cat .env \| grep MODAL` 印出整行設定，可能含 Modal token；改成只列變數名稱並加測試（修前紅、修後綠）。R-28 修正的 fresh 審查時發現 | `8f6cf8b`（2026-11-25） |
 
 ## 接受、不改契約
 
