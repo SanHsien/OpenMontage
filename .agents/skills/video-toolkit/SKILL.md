@@ -50,7 +50,7 @@ Note: `--break-system-packages` is needed on Debian/Ubuntu with managed Python (
 The toolkit needs cloud GPU endpoint URLs in `.env`. Check if `.env` exists and has Modal endpoints:
 
 ```bash
-cat ~/.openclaw/workspace/claude-code-video-toolkit/.env | grep MODAL
+grep -o '^MODAL[A-Z0-9_]*' ~/.openclaw/workspace/claude-code-video-toolkit/.env  # names only; never print values
 ```
 
 If Modal endpoints are configured, you're ready. If not, **ask the user to provide Modal endpoint URLs** or set up Modal:

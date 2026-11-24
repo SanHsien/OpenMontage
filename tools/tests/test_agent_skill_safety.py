@@ -66,3 +66,18 @@ def test_agent_skill_local_references_exist(relative):
     assert any(local), f"{relative}: no local references checked"
     missing = [target for target in local if target and not (source.parent / target).exists()]
     assert not missing, f"{relative}: missing {missing}"
+
+
+VIDEO_TOOLKIT_FILES = [
+    ".agents/skills/video-toolkit/SKILL.md",
+    ".claude/skills/video_toolkit/SKILL.md",
+]
+
+
+@pytest.mark.parametrize("relative", VIDEO_TOOLKIT_FILES)
+def test_video_toolkit_env_check_lists_names_not_values(relative):
+    # `cat .env | grep MODAL` prints whole assignments, including any Modal token.
+    text = (ROOT / relative).read_text(encoding="utf-8")
+    assert not re.search(r"(?im)^\s*cat\b[^\n]*\.env", text)
+    for line in re.findall(r"(?im)^\s*grep\b[^\n]*\.env[^\n]*$", text):
+        assert re.search(r"\bgrep\s+-o\s+'\^MODAL\[A-Z0-9_\]\*'", line), line
