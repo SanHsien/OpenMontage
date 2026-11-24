@@ -1,6 +1,7 @@
 # Repository review（Windows-only）
 
 - Review date: 2026-09-12
+- Incremental agent review: 2026-11-24（僅 BFL 憑證指引；其餘仍為原始快照）
 - Review baseline: `08e2151fa02de28a5d6a312b3d575692bf147ad7`
 - Remediation: 同日 fork-local overlay（不回貢）
 - Upstream reviewed through: `08e2151fa02de28a5d6a312b3d575692bf147ad7`
@@ -35,6 +36,7 @@ gh repo set-default --view
 
 | ID | 嚴重度 | 做了什麼 |
 |---|---|---|
+| R-28 | P1 | **已修（2026-11-24，`ec386e66302d8d3c86b245a43d6861deecbcd2b8`）**：上游 [#964](https://github.com/OpenMontageInc/OpenMontage/issues/964)／[#979](https://github.com/OpenMontageInc/OpenMontage/pull/979) 指出 BFL 技能 echo 金鑰與要求聊天貼金鑰；本地重做並額外移除裸 grep `.env`，同步兩份技能與參考文件。安全檢查修前 4 failed／6 passed，修後含假金鑰測試 18 passed；agent 契約 242 passed、Windows gate exit 0。 |
 | R-01 | P2 | `.gitignore` 加入 `.env`、`.venv`、`upstream-review-report.md`、`dependency-freshness-report.md`、`.ruff_cache/` |
 | R-02 | P2 | 建立獨立維護測試目錄 `tools/tests/` 與獨立 `tools/pytest.ini`，避免產品環境污染 |
 | R-03 | P2 | 建立 `FORK.md`、`NOTICE.md`、`SECURITY.md`、`AGENTS.md`、`CLAUDE.md`、`GEMINI.md`，寫明對外邊界與安全性 |

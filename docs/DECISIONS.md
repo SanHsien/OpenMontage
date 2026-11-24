@@ -76,6 +76,8 @@
 
 ### Agent 檢查與採用驗收
 
+修復提交：`ec386e66302d8d3c86b245a43d6861deecbcd2b8`（2026-11-24），對應 REVIEW.md R-28。
+
 - #970 僅審 manifests 及安裝說明，沒有安裝或 runtime discovery claim；既有工具技能指標另跑本地契約測試。
 - #979 本地重做只修既有文件，未採納新第三方 Skill/MCP bundle。上游 patch 仍保留會印出整筆金鑰的裸 grep，因此不原樣套用；兩棵技能目錄同步修正。
 - 新增 `tools/tests/test_agent_skill_safety.py`，納入既有 dev_check：四份 BFL 文件禁止憑證輸出與聊天索取，使用空值／假金鑰執行文件中的 Python 指令，輸出只能是存在狀態；另查 #980 涉及的六份文件實際本地引用。
