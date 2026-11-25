@@ -6,7 +6,7 @@
 
 1. 先讀 [`AGENTS.md`](AGENTS.md)、[`FORK.md`](FORK.md) 與 [`README.md`](README.md)。
 2. 確認問題在最新 `main` 仍可重現，並查過既有 Issues。
-3. 產品核心行為的實質變更，優先考慮回報或回貢 [`calesthio/OpenMontage`](https://github.com/calesthio/OpenMontage)。
+3. 產品核心行為的實質變更，優先考慮回報或回貢 [`OpenMontageInc/OpenMontage`](https://github.com/OpenMontageInc/OpenMontage)。
 4. 不要附上真實使用者影片素材、專有文件、未經授權的商業檔案或任何 API key。
 
 ## 本機開發

@@ -10,7 +10,7 @@ Original work:
 - Project: `OpenMontage`
 - Authors: calesthio and OpenMontage contributors
 - License: GNU Affero General Public License v3.0 (AGPL-3.0)
-- Upstream: https://github.com/calesthio/OpenMontage
+- Upstream: https://github.com/OpenMontageInc/OpenMontage
 
 This repository keeps the AGPL-3.0 license text in [`LICENSE`](LICENSE). Modifications, documentation, and future project-specific changes in this fork are also licensed under the AGPL-3.0 unless otherwise noted.
 

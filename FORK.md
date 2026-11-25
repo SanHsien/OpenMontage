@@ -1,7 +1,11 @@
 ﻿# Fork 維護說明
 
-本 repo fork 自 [`calesthio/OpenMontage`](https://github.com/calesthio/OpenMontage)，
+本 repo fork 自 [`OpenMontageInc/OpenMontage`](https://github.com/OpenMontageInc/OpenMontage)，
 沿用 GNU Affero General Public License v3.0 (AGPL-3.0) 與完整 Git 歷史。
+
+上游原本在作者個人帳號 `calesthio/OpenMontage`，後來轉移到 `OpenMontageInc` 組織，兩者是同一個 repo
+（GitHub id `1195360525`，舊網址會自動轉址）。2026-11-25 發現本機 `upstream` 仍指向舊網址，已改成新網址；
+`docs/DECISIONS.md`、`docs/UPSTREAM.md` 的審查紀錄與上游產品文件（README、Issue 範本等）保留原文。
 
 ## 為什麼維護 fork
 
@@ -50,7 +54,7 @@
 
 - `origin/main`：SanHsien 維護線，也是唯一長期分支。
 - 日常修改在本機跑 gate 後直接推 `origin/main`。
-- `upstream/main`：calesthio 原始專案，只追蹤、不推送。
+- `upstream/main`：OpenMontageInc 原始專案（原 calesthio 個人帳號下），只追蹤、不推送。
 - Dependabot 或外部 fork 的變更走 PR，讀 diff 並通過 CI 後再合併。
 
 不要 `git push upstream`。同步方式見 [`docs/UPSTREAM.md`](docs/UPSTREAM.md)。
@@ -63,7 +67,7 @@
 git clone https://github.com/SanHsien/OpenMontage.git
 cd OpenMontage
 # `gh repo clone` 已會加上 `upstream` remote；若沒有：
-# git remote add upstream https://github.com/calesthio/OpenMontage.git
+# git remote add upstream https://github.com/OpenMontageInc/OpenMontage.git
 pwsh -NoProfile -File tools\bootstrap_dev.ps1
 ```
 

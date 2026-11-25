@@ -88,4 +88,4 @@ CI 專注於 Windows 原生環境，在 `windows-latest` 執行完整 Python 3.1
 ## 不要做的事
 
 - 不要提交含有個人憑證、API key 或敏感商業影片的檔案。
-- 不要把 PR 指向上游 `calesthio/OpenMontage`。
+- 不要把 PR 指向上游 `OpenMontageInc/OpenMontage`。

@@ -85,7 +85,7 @@ def test_ci_covers_python_314() -> None:
 
 def test_baseline_file_is_valid_and_complete() -> None:
     baseline = checker.load_baseline()
-    assert baseline["repo"] == "https://github.com/calesthio/OpenMontage.git"
+    assert baseline["repo"] == "https://github.com/OpenMontageInc/OpenMontage.git"
     assert baseline["branch"] == "main"
     assert len(baseline["reviewed_through"]) == 40
     # The watermark advances with every review; pin its shape, not one value.

@@ -4,7 +4,7 @@
 
 ## 專案定位
 
-這是 [`calesthio/OpenMontage`](https://github.com/calesthio/OpenMontage) 的 GNU AGPLv3 fork。
+這是 [`OpenMontageInc/OpenMontage`](https://github.com/OpenMontageInc/OpenMontage) 的 GNU AGPLv3 fork。
 核心價值是 12 條影片生產管線、視覺化故事板 Backlot、Remotion 高清合成、本機離線生成（Ollama、ComfyUI、Piper TTS）與 700+ Agent 技能檔案。
 
 `origin` 是 `SanHsien/OpenMontage`（預設分支 `main`），`upstream` 是原作者 repo（預設分支 `main`）。
@@ -17,7 +17,7 @@
 - 不提交使用者輸入影片、音訊素材、專有文件、API key、token、私鑰或 `.env`。
 - 臨時重現腳本、測試產出與素材（暫存輸出、`pytest-of-*`、重現用影音）不提交；回歸測試與契約測試放 `tests/`、`tools/tests/` 照常提交。
 - 不推送到 `upstream`。上游同步先跑 `python tools/check_upstream_updates.py`，逐筆審查後再 merge / cherry-pick；不盲目覆蓋 fork 文件與 Windows gate。
-- PR、push、release 一律指向 `SanHsien/OpenMontage`，嚴禁未經當次許可打向 `calesthio/OpenMontage`。
+- PR、push、release 一律指向 `SanHsien/OpenMontage`，嚴禁未經當次許可打向 `OpenMontageInc/OpenMontage`。
 - 不要把維護 gate 改成完整產品依賴安裝。維護環境（`requirements-dev.txt`）僅安裝 pytest、ruff 與必要依賴。
 - 不把 fork 包裝成原創產品，不移除上游作者或官方連結。
 

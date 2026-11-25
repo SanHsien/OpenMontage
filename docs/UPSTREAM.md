@@ -3,7 +3,7 @@
 ## Remote
 
 - Fork：`origin` → `https://github.com/SanHsien/OpenMontage.git`（預設分支 `main`）
-- 原作者：`upstream` → `https://github.com/calesthio/OpenMontage.git`（預設分支 `main`）
+- 原作者：`upstream` → `https://github.com/OpenMontageInc/OpenMontage.git`（預設分支 `main`）
 - 追蹤分支：`main`
 
 ## 檢查新提交
