@@ -108,7 +108,7 @@
 | `ci.yml` | push 的 matrix 5 格（3.10..3.14）→ 2 格（3.10、3.14）；pull request 與手動執行維持 5 格；push 略過只改維護紀錄的提交（`ROADMAP.md`、`REVIEW.md`、`FORK.md`、`NOTICE.md`、兩份報告、`docs/DECISIONS.md`、`docs/UPSTREAM.md`、`tools/upstream_baseline.json`） |
 | `codeql.yml` | push 只在 `**/*.py` 或該 workflow 改動時跑（原：每次 push）；runner Windows → Linux（Python 抽取不需建置，結果不依賴 OS，分鐘數約減半）；pull request 與每週排程不變 |
 
-**不動**：`upstream-check.yml`、`dependency-freshness.yml`（本來就只在相關檔案 push 或排程時跑，且是維護所需檢查）。`tools/tests/test_fork_docs.py::test_ci_covers_python_314` 釘住的 `"3.14"`、`windows / py`、`dev_check.ps1` 仍在 `ci.yml`。
+**不動**：`upstream-check.yml`、`dependency-freshness.yml`（本來就只在相關檔案 push 或排程時跑，且是維護所需檢查）。`tools/tests/test_fork_docs.py` 的 `test_ci_covers_python_314` 釘住的 `"3.14"`、`windows / py`、`dev_check.ps1` 仍在 `ci.yml`。
 
 **預估**：CI 每次 push 的分鐘約 -60%，加上紀錄類提交略過，總用量約減半以上。
 
